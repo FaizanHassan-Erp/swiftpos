@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useApp } from '../context/AppContext'
+import { useApp } from '../Context/AppContext'
 
 export default function Stockexpiryreport() {
   const { state } = useApp()

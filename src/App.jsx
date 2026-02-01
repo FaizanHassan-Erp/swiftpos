@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
-import { AppProvider } from './context/AppContext'
+import { AuthProvider, useAuth } from './Context/AuthContext'
+import { AppProvider } from './Context/AppContext'
 import Layout from './Components/Layout'
 import { useState } from 'react'
 

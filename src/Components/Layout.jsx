@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
-import { useAuth } from '../context/AuthContext'
+import { useApp } from '../Context/AppContext'
+import { useAuth } from '../Context/AuthContext'
 import OfflineIndicator from './OfflineIndicator'
 
 export default function Layout({ children }) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
+import { useApp } from '../Context/AppContext'
 
 export default function POS() {
   const navigate = useNavigate()
