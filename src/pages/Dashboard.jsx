@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useApp } from '../Context/AppContext'
+import { useApp } from '../context/AppContext'
 
 export default function Dashboard() {
   const { state } = useApp()

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useApp } from '../Context/AppContext'
+import { useApp } from '../context/AppContext'
 
 export default function ReceiptPrinters() {
   const { state, dispatch } = useApp()

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import { AuthProvider, useAuth } from './Context/AuthContext'
-import { AppProvider } from './Context/AppContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
+import { AppProvider } from './context/AppContext'
 import Layout from './Components/Layout'
 import { useState } from 'react'
 
@@ -537,7 +537,7 @@ function LoginPage() {
 // ============== REGISTER PAGE ==============
 function RegisterPage() {
   const navigate = useNavigate()
-  const { signup } = useAuth()
+  const { register } = useAuth()
   const [businessName, setBusinessName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -577,7 +577,7 @@ function RegisterPage() {
 
     setLoading(true)
     try {
-      const result = await signup(email.trim(), password, businessName.trim())
+      const result = await register(email.trim(), password, '', businessName.trim())
       if (result.success) {
         setMessage(result.message)
         setBusinessName(''); setEmail(''); setPassword(''); setConfirmPassword('')

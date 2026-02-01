@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useApp } from '../Context/AppContext'
+import { useApp } from '../context/AppContext'
 
 export default function CashRegister() {
   const { state, dispatch } = useApp()
