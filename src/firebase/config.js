@@ -3,13 +3,13 @@ import { getAuth, createUserWithEmailAndPassword, signOut, browserLocalPersisten
 import { initializeFirestore, persistentLocalCache, persistentSingleTabManager, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAYONkXAjHnSMSrLae3nW5ZOgMv0DurTaY",
-  authDomain: "swiftpos-d35fb.firebaseapp.com",
-  projectId: "swiftpos-d35fb",
-  storageBucket: "swiftpos-d35fb.firebasestorage.app",
-  messagingSenderId: "847040265638",
-  appId: "1:847040265638:web:958e1b1a481df591eea367",
-  measurementId: "G-H7TN0V2WFT"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
 // Initialize Firebase
@@ -218,3 +218,16 @@ export async function createBusinessOwnerRecord(user, businessName) {
 
 // Default export
 export default app
+```
+
+---
+
+## Next Steps
+
+### 1. Make sure `.env` is in `.gitignore`
+
+Open `.gitignore` and add these lines if not already there:
+```
+.env
+.env.local
+.env.production

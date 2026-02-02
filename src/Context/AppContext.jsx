@@ -299,10 +299,6 @@ const defaultState = {
   registerSessions: [],
   registerSessionCounter: 1,
 
-  // Register Sessions (Cash Register)
-  registerSessions: [],
-  registerSessionCounter: 1,
-
   // Expense Categories
   expenseCategories: [
     { id: 1, name: 'Rent' },
