@@ -18,7 +18,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
-  const [userData, setUserData] = useState(null) // Firestore user data (role, status, etc.)
+  const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   // Register new business owner
@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       
       // Update display name
-      await updateProfile(userCredential.user, { displayName: name })
+      await updateProfile(userCredential.user, { displayName: name || businessName })
       
       // Send verification email
       await sendEmailVerification(userCredential.user)
@@ -35,7 +35,10 @@ export function AuthProvider({ children }) {
       // Create business owner record in Firestore
       await createBusinessOwnerRecord(userCredential.user, businessName)
       
-      return { success: true, message: 'Account created! Please verify your email.' }
+      // IMPORTANT: Sign out so user must verify email before logging in
+      await signOut(auth)
+      
+      return { success: true, message: 'Account created! Please check your email to verify your account.' }
     } catch (error) {
       let message = 'Failed to create account'
       if (error.code === 'auth/email-already-in-use') {
@@ -55,8 +58,15 @@ export function AuthProvider({ children }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
       
-      // Check email verification (only for owners who registered themselves)
-      // Staff added by owners don't need email verification
+      // Check email verification for business owners
+      if (!user.emailVerified) {
+        await signOut(auth)
+        return { 
+          success: false, 
+          message: 'Please verify your email before logging in. Check your inbox and spam folder.',
+          needsVerification: true
+        }
+      }
       
       // Get user data from Firestore
       const result = await getUserData(user.uid)
@@ -77,7 +87,6 @@ export function AuthProvider({ children }) {
       } else {
         // User exists in Firebase Auth but not in Firestore
         // This might be an old user or owner who registered before Firestore setup
-        // Create a record for them
         await createBusinessOwnerRecord(user, 'My Business')
         const newResult = await getUserData(user.uid)
         if (newResult.success) {
@@ -90,8 +99,8 @@ export function AuthProvider({ children }) {
       let message = 'Failed to login'
       if (error.code === 'auth/user-not-found') {
         message = 'No account found with this email'
-      } else if (error.code === 'auth/wrong-password') {
-        message = 'Incorrect password'
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = 'Incorrect email or password'
       } else if (error.code === 'auth/invalid-email') {
         message = 'Invalid email address'
       } else if (error.code === 'auth/too-many-requests') {
@@ -111,7 +120,7 @@ export function AuthProvider({ children }) {
   async function resetPassword(email) {
     try {
       await sendPasswordResetEmail(auth, email)
-      return { success: true, message: 'Password reset email sent!' }
+      return { success: true, message: 'Password reset email sent! Check your inbox.' }
     } catch (error) {
       let message = 'Failed to send reset email'
       if (error.code === 'auth/user-not-found') {
@@ -122,15 +131,23 @@ export function AuthProvider({ children }) {
   }
 
   // Resend verification email
-  async function resendVerificationEmail() {
+  async function resendVerificationEmail(email, password) {
     try {
-      if (currentUser) {
-        await sendEmailVerification(currentUser)
-        return { success: true, message: 'Verification email sent!' }
-      }
-      return { success: false, message: 'No user logged in' }
+      // Need to sign in first to resend verification
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      await sendEmailVerification(userCredential.user)
+      await signOut(auth)
+      return { success: true, message: 'Verification email sent! Check your inbox and spam folder.' }
     } catch (error) {
-      return { success: false, message: 'Failed to send verification email' }
+      let message = 'Failed to send verification email'
+      if (error.code === 'auth/user-not-found') {
+        message = 'No account found with this email'
+      } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = 'Incorrect password'
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'Too many attempts. Please try again later.'
+      }
+      return { success: false, message }
     }
   }
 
@@ -140,24 +157,30 @@ export function AuthProvider({ children }) {
       setCurrentUser(user)
       
       if (user) {
-        // Fetch user data from Firestore
-        const result = await getUserData(user.uid)
-        if (result.success) {
-          // Check if user is still active
-          if (result.user.status === 'inactive') {
-            // User was deactivated, sign them out
-            await signOut(auth)
-            setUserData(null)
+        // Only set user data if email is verified
+        if (user.emailVerified) {
+          // Fetch user data from Firestore
+          const result = await getUserData(user.uid)
+          if (result.success) {
+            // Check if user is still active
+            if (result.user.status === 'inactive') {
+              // User was deactivated, sign them out
+              await signOut(auth)
+              setUserData(null)
+            } else {
+              setUserData(result.user)
+            }
           } else {
-            setUserData(result.user)
+            // Create record for users who don't have one
+            await createBusinessOwnerRecord(user, 'My Business')
+            const newResult = await getUserData(user.uid)
+            if (newResult.success) {
+              setUserData(newResult.user)
+            }
           }
         } else {
-          // Create record for users who don't have one
-          await createBusinessOwnerRecord(user, 'My Business')
-          const newResult = await getUserData(user.uid)
-          if (newResult.success) {
-            setUserData(newResult.user)
-          }
+          // Email not verified, don't set user data
+          setUserData(null)
         }
       } else {
         setUserData(null)
@@ -171,7 +194,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
-    userData,        // Contains role, status, businessId, etc.
+    userData,
     loading,
     register,
     login,
