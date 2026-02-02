@@ -82,7 +82,11 @@ function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth()
 
   if (loading) return <LoadingSpinner />
-  if (!currentUser) return <Navigate to="/login" replace />
+  
+  // currentUser is only set when email is verified (handled in AuthContext)
+  if (!currentUser) {
+    return <Navigate to="/login" replace />
+  }
 
   return (
     <AppProvider>
@@ -96,7 +100,11 @@ function PublicRoute({ children }) {
   const { currentUser, loading } = useAuth()
 
   if (loading) return <LoadingSpinner />
-  if (currentUser) return <Navigate to="/dashboard" replace />
+  
+  // currentUser is only set when email is verified (handled in AuthContext)
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   return children
 }
@@ -430,6 +438,7 @@ function LoginPage() {
     setLoading(true)
     setError('')
     setMessage('')
+    setNeedsVerification(false)
 
     const result = await login(email, password)
     if (!result.success) {
@@ -440,6 +449,10 @@ function LoginPage() {
   }
 
   async function handleResendVerification() {
+    if (!email.trim() || !password) {
+      setError('Please enter your email and password first')
+      return
+    }
     setLoading(true)
     setError('')
     const result = await resendVerificationEmail(email, password)
@@ -470,7 +483,9 @@ function LoginPage() {
               <div>
                 {error}
                 {needsVerification && (
-                  <button onClick={handleResendVerification} className="block mt-2 text-emerald-400 hover:underline">Resend verification email</button>
+                  <button onClick={handleResendVerification} disabled={loading} className="block mt-2 text-emerald-400 hover:underline">
+                    Resend verification email
+                  </button>
                 )}
               </div>
             </div>

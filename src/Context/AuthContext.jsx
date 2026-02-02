@@ -86,7 +86,6 @@ export function AuthProvider({ children }) {
         setUserData(firestoreUser)
       } else {
         // User exists in Firebase Auth but not in Firestore
-        // This might be an old user or owner who registered before Firestore setup
         await createBusinessOwnerRecord(user, 'My Business')
         const newResult = await getUserData(user.uid)
         if (newResult.success) {
@@ -113,6 +112,7 @@ export function AuthProvider({ children }) {
   // Logout
   async function logout() {
     setUserData(null)
+    setCurrentUser(null)
     return signOut(auth)
   }
 
@@ -133,7 +133,6 @@ export function AuthProvider({ children }) {
   // Resend verification email
   async function resendVerificationEmail(email, password) {
     try {
-      // Need to sign in first to resend verification
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       await sendEmailVerification(userCredential.user)
       await signOut(auth)
@@ -154,35 +153,30 @@ export function AuthProvider({ children }) {
   // Listen to auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user)
-      
-      if (user) {
-        // Only set user data if email is verified
-        if (user.emailVerified) {
-          // Fetch user data from Firestore
-          const result = await getUserData(user.uid)
-          if (result.success) {
-            // Check if user is still active
-            if (result.user.status === 'inactive') {
-              // User was deactivated, sign them out
-              await signOut(auth)
-              setUserData(null)
-            } else {
-              setUserData(result.user)
-            }
+      // Only consider user logged in if email is verified
+      if (user && user.emailVerified) {
+        setCurrentUser(user)
+        
+        // Fetch user data from Firestore
+        const result = await getUserData(user.uid)
+        if (result.success) {
+          if (result.user.status === 'inactive') {
+            await signOut(auth)
+            setCurrentUser(null)
+            setUserData(null)
           } else {
-            // Create record for users who don't have one
-            await createBusinessOwnerRecord(user, 'My Business')
-            const newResult = await getUserData(user.uid)
-            if (newResult.success) {
-              setUserData(newResult.user)
-            }
+            setUserData(result.user)
           }
         } else {
-          // Email not verified, don't set user data
-          setUserData(null)
+          await createBusinessOwnerRecord(user, 'My Business')
+          const newResult = await getUserData(user.uid)
+          if (newResult.success) {
+            setUserData(newResult.user)
+          }
         }
       } else {
+        // Not logged in OR email not verified
+        setCurrentUser(null)
         setUserData(null)
       }
       
