@@ -18,6 +18,27 @@ export default function Products() {
   const [filterBrand, setFilterBrand] = useState('')
   const [filterExpiry, setFilterExpiry] = useState('')
 
+  // NEW: Quick Add Modal States
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [showBrandModal, setShowBrandModal] = useState(false)
+  const [showUnitModal, setShowUnitModal] = useState(false)
+
+  // NEW: Quick Add Form Data
+  const [newCategoryData, setNewCategoryData] = useState({
+    name: '',
+    code: '',
+    description: ''
+  })
+  const [newBrandData, setNewBrandData] = useState({
+    name: '',
+    description: ''
+  })
+  const [newUnitData, setNewUnitData] = useState({
+    name: '',
+    shortName: '',
+    allowDecimal: true
+  })
+
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -174,6 +195,17 @@ export default function Products() {
     })
   }
 
+  // NEW: Reset Quick Add Forms
+  function resetCategoryForm() {
+    setNewCategoryData({ name: '', code: '', description: '' })
+  }
+  function resetBrandForm() {
+    setNewBrandData({ name: '', description: '' })
+  }
+  function resetUnitForm() {
+    setNewUnitData({ name: '', shortName: '', allowDecimal: true })
+  }
+
   function openAddModal() {
     setEditingProduct(null)
     resetForm()
@@ -257,6 +289,60 @@ export default function Products() {
     }
     setShowModal(false)
     resetForm()
+  }
+
+  // NEW: Handle Quick Add Category
+  function handleCategorySubmit(e) {
+    e.preventDefault()
+    if (!newCategoryData.name) {
+      alert('Category name is required')
+      return
+    }
+    const newCategory = {
+      ...newCategoryData,
+      id: Date.now()
+    }
+    dispatch({ type: 'ADD_CATEGORY', payload: newCategory })
+    // Auto-select the new category
+    setFormData({ ...formData, categoryId: newCategory.id.toString() })
+    setShowCategoryModal(false)
+    resetCategoryForm()
+  }
+
+  // NEW: Handle Quick Add Brand
+  function handleBrandSubmit(e) {
+    e.preventDefault()
+    if (!newBrandData.name) {
+      alert('Brand name is required')
+      return
+    }
+    const newBrand = {
+      ...newBrandData,
+      id: Date.now()
+    }
+    dispatch({ type: 'ADD_BRAND', payload: newBrand })
+    // Auto-select the new brand
+    setFormData({ ...formData, brandId: newBrand.id.toString() })
+    setShowBrandModal(false)
+    resetBrandForm()
+  }
+
+  // NEW: Handle Quick Add Unit
+  function handleUnitSubmit(e) {
+    e.preventDefault()
+    if (!newUnitData.name || !newUnitData.shortName) {
+      alert('Unit name and short name are required')
+      return
+    }
+    const newUnit = {
+      ...newUnitData,
+      id: Date.now()
+    }
+    dispatch({ type: 'ADD_UNIT', payload: newUnit })
+    // Auto-select the new unit
+    setFormData({ ...formData, unitId: newUnit.id.toString() })
+    setShowUnitModal(false)
+    resetUnitForm()
   }
 
   function handleDelete(id) {
@@ -676,25 +762,22 @@ export default function Products() {
                   <p className="text-slate-400 text-sm">No products expiring soon</p>
                 ) : (
                   <div className="space-y-3 max-h-80 overflow-y-auto">
-                    {expiringProducts.filter(p => getExpiryStatus(p.expiryDate).status !== 'expired').map(product => {
-                      const status = getExpiryStatus(product.expiryDate)
-                      return (
-                        <div key={product.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                          <div>
-                            <p className="text-white font-medium">{product.name}</p>
-                            <p className="text-slate-400 text-xs">
-                              Expires: {new Date(product.expiryDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <ExpiryBadge expiryDate={product.expiryDate} />
-                            <p className="text-slate-500 text-xs mt-1">
-                              Stock: {product.currentStock}
-                            </p>
-                          </div>
+                    {expiringProducts.filter(p => getExpiryStatus(p.expiryDate).status !== 'expired').map(product => (
+                      <div key={product.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div>
+                          <p className="text-white font-medium">{product.name}</p>
+                          <p className="text-slate-400 text-xs">
+                            Expires: {new Date(product.expiryDate).toLocaleDateString()}
+                          </p>
                         </div>
-                      )
-                    })}
+                        <div className="text-right">
+                          <ExpiryBadge expiryDate={product.expiryDate} />
+                          <p className="text-slate-500 text-xs mt-1">
+                            Stock: {product.currentStock}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -901,45 +984,87 @@ export default function Products() {
                   </div>
                 </div>
 
+                {/* UPDATED: Category, Brand, Unit with + Buttons */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Category with + Button */}
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
-                    <select
-                      value={formData.categoryId}
-                      onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select
+                        value={formData.categoryId}
+                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                        className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="">Select Category</option>
+                        {categories.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { resetCategoryForm(); setShowCategoryModal(true); }}
+                        className="px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                        title="Add New Category"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
+                  
+                  {/* Brand with + Button */}
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Brand</label>
-                    <select
-                      value={formData.brandId}
-                      onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="">Select Brand</option>
-                      {brands.map(b => (
-                        <option key={b.id} value={b.id}>{b.name}</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select
+                        value={formData.brandId}
+                        onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
+                        className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="">Select Brand</option>
+                        {brands.map(b => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { resetBrandForm(); setShowBrandModal(true); }}
+                        className="px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                        title="Add New Brand"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
+                  
+                  {/* Unit with + Button */}
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Unit *</label>
-                    <select
-                      value={formData.unitId}
-                      onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
-                    >
-                      <option value="">Select Unit</option>
-                      {units.map(u => (
-                        <option key={u.id} value={u.id}>{u.name} ({u.shortName})</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select
+                        value={formData.unitId}
+                        onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
+                        className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="">Select Unit</option>
+                        {units.map(u => (
+                          <option key={u.id} value={u.id}>{u.name} ({u.shortName})</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => { resetUnitForm(); setShowUnitModal(true); }}
+                        className="px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                        title="Add New Unit"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1145,6 +1270,202 @@ export default function Products() {
         </div>
       )}
 
+      {/* NEW: Quick Add Category Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-t-2xl">
+              <div>
+                <h2 className="text-lg font-bold text-white">Quick Add Category</h2>
+                <p className="text-emerald-100 text-sm">Create and select category</p>
+              </div>
+              <button onClick={() => setShowCategoryModal(false)} className="text-white/80 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleCategorySubmit} className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Category Name *</label>
+                <input
+                  type="text"
+                  value={newCategoryData.name}
+                  onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="Category name"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Category Code</label>
+                <input
+                  type="text"
+                  value={newCategoryData.code}
+                  onChange={(e) => setNewCategoryData({ ...newCategoryData, code: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="HSN Code (optional)"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <textarea
+                  value={newCategoryData.description}
+                  onChange={(e) => setNewCategoryData({ ...newCategoryData, description: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  rows="2"
+                  placeholder="Description (optional)"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(false)}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
+                >
+                  Create & Select
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Quick Add Brand Modal */}
+      {showBrandModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-t-2xl">
+              <div>
+                <h2 className="text-lg font-bold text-white">Quick Add Brand</h2>
+                <p className="text-emerald-100 text-sm">Create and select brand</p>
+              </div>
+              <button onClick={() => setShowBrandModal(false)} className="text-white/80 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleBrandSubmit} className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Brand Name *</label>
+                <input
+                  type="text"
+                  value={newBrandData.name}
+                  onChange={(e) => setNewBrandData({ ...newBrandData, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="Brand name"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <input
+                  type="text"
+                  value={newBrandData.description}
+                  onChange={(e) => setNewBrandData({ ...newBrandData, description: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="Short description (optional)"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowBrandModal(false)}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
+                >
+                  Create & Select
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Quick Add Unit Modal */}
+      {showUnitModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-t-2xl">
+              <div>
+                <h2 className="text-lg font-bold text-white">Quick Add Unit</h2>
+                <p className="text-emerald-100 text-sm">Create and select unit</p>
+              </div>
+              <button onClick={() => setShowUnitModal(false)} className="text-white/80 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleUnitSubmit} className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Unit Name *</label>
+                <input
+                  type="text"
+                  value={newUnitData.name}
+                  onChange={(e) => setNewUnitData({ ...newUnitData, name: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="e.g., Kilogram"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Short Name *</label>
+                <input
+                  type="text"
+                  value={newUnitData.shortName}
+                  onChange={(e) => setNewUnitData({ ...newUnitData, shortName: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                  placeholder="e.g., Kg"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Allow Decimal</label>
+                <select
+                  value={newUnitData.allowDecimal ? 'yes' : 'no'}
+                  onChange={(e) => setNewUnitData({ ...newUnitData, allowDecimal: e.target.value === 'yes' })}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowUnitModal(false)}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
+                >
+                  Create & Select
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* View Product Modal */}
       {showViewModal && selectedProduct && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1242,7 +1563,6 @@ export default function Products() {
               {/* Details Tab */}
               {viewTab === 'details' && (
                 <div className="space-y-6">
-                  {/* Details Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-slate-900/50 p-4 rounded-lg">
                       <p className="text-slate-400 text-sm">Category</p>
@@ -1262,7 +1582,6 @@ export default function Products() {
                     </div>
                   </div>
 
-                  {/* Expiry Info */}
                   {selectedProduct.expiryDate && (
                     <div className={`p-4 rounded-lg border ${
                       getExpiryStatus(selectedProduct.expiryDate).status === 'expired' 
@@ -1281,7 +1600,6 @@ export default function Products() {
                     </div>
                   )}
 
-                  {/* Pricing */}
                   <div className="grid grid-cols-3 gap-4">
                     <div className="bg-slate-900/50 p-4 rounded-lg">
                       <p className="text-slate-400 text-sm">Cost Price</p>
@@ -1302,7 +1620,6 @@ export default function Products() {
                     </div>
                   </div>
 
-                  {/* Stock Info */}
                   <div className="bg-slate-900/50 p-4 rounded-lg">
                     <div className="flex items-center justify-between">
                       <div>
@@ -1326,7 +1643,6 @@ export default function Products() {
                     </div>
                   </div>
 
-                  {/* Stock Movement Summary */}
                   {(() => {
                     const summary = getStockMovementSummary(selectedProduct.id)
                     return (
@@ -1350,7 +1666,6 @@ export default function Products() {
                     )
                   })()}
 
-                  {/* Description */}
                   {selectedProduct.description && (
                     <div className="bg-slate-900/50 p-4 rounded-lg">
                       <p className="text-slate-400 text-sm mb-2">Description</p>
@@ -1404,7 +1719,7 @@ export default function Products() {
                 </div>
               )}
 
-              {/* Purchases Tab - with expiry info */}
+              {/* Purchases Tab */}
               {viewTab === 'purchases' && (
                 <div className="space-y-4">
                   {getProductPurchases(selectedProduct.id).length === 0 ? (

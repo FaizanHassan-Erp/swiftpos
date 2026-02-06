@@ -385,56 +385,56 @@ export default function POS() {
           {filteredProducts.length === 0 && (<div className="text-center py-8 text-slate-500">No products found</div>)}
         </div>
       </div>
-
+      
       {/* Payment Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
-            <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">Payment</h2>
-              <button onClick={() => setShowPaymentModal(false)} className="text-slate-400 hover:text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="text-center mb-6">
-                <p className="text-slate-400">Total Amount</p>
-                <p className="text-4xl font-bold text-white">{business.currency} {grandTotal.toFixed(2)}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
-                <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white">
-                  <option value="Cash">Cash</option>
-                  <option value="Card">Card</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
-                <select 
-                  value={paymentAccountId} 
-                  onChange={(e) => setPaymentAccountId(e.target.value)} 
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white"
-                >
-                  <option value="">Select Account</option>
-                  {activeAccounts.map(acc => (
-                    <option key={acc.id} value={acc.id}>{acc.name} ({acc.accountType || 'Default'})</option>
-                  ))}
-                </select>
-                {!paymentAccountId && (
-                  <p className="text-yellow-400 text-xs mt-1">⚠️ Select account to track payment</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Amount Received</label>
-                <input type="number" value={amountReceived} onChange={(e) => setAmountReceived(parseFloat(e.target.value) || 0)} className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-xl font-bold" />
-              </div>
-              {changeAmount >= 0 && (<div className="p-4 bg-emerald-500/20 rounded-lg"><p className="text-emerald-400 text-sm">Change</p><p className="text-2xl font-bold text-emerald-400">{business.currency} {changeAmount.toFixed(2)}</p></div>)}
-              {changeAmount < 0 && (<div className="p-4 bg-red-500/20 rounded-lg"><p className="text-red-400 text-sm">Due Amount</p><p className="text-2xl font-bold text-red-400">{business.currency} {Math.abs(changeAmount).toFixed(2)}</p></div>)}
-              <div className="grid grid-cols-4 gap-2">{[100, 500, 1000, 5000].map(amount => (<button key={amount} onClick={() => setAmountReceived(amount)} className="py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600">{amount}</button>))}</div>
-              <button onClick={() => processSale(paymentMethod)} disabled={amountReceived < grandTotal} className="w-full py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed">Complete Sale</button>
-            </div>
-          </div>
+{showPaymentModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-auto">
+      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-white">Payment</h2>
+        <button onClick={() => setShowPaymentModal(false)} className="text-slate-400 hover:text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+      </div>
+      <div className="p-4 space-y-3">
+        <div className="text-center mb-4">
+          <p className="text-slate-400 text-sm">Total Amount</p>
+          <p className="text-2xl font-bold text-white">{business.currency} {grandTotal.toFixed(2)}</p>
         </div>
-      )}
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Payment Method</label>
+          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm">
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Payment Account *</label>
+          <select 
+            value={paymentAccountId} 
+            onChange={(e) => setPaymentAccountId(e.target.value)} 
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm"
+          >
+            <option value="">Select Account</option>
+            {activeAccounts.map(acc => (
+              <option key={acc.id} value={acc.id}>{acc.name} ({acc.accountType || 'Default'})</option>
+            ))}
+          </select>
+          {!paymentAccountId && (
+            <p className="text-yellow-400 text-xs mt-1">⚠️ Select account to track payment</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Amount Received</label>
+          <input type="number" value={amountReceived} onChange={(e) => setAmountReceived(parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg font-bold" />
+        </div>
+        {changeAmount >= 0 && (<div className="p-3 bg-emerald-500/20 rounded-lg"><p className="text-emerald-400 text-xs">Change</p><p className="text-xl font-bold text-emerald-400">{business.currency} {changeAmount.toFixed(2)}</p></div>)}
+        {changeAmount < 0 && (<div className="p-3 bg-red-500/20 rounded-lg"><p className="text-red-400 text-xs">Due Amount</p><p className="text-xl font-bold text-red-400">{business.currency} {Math.abs(changeAmount).toFixed(2)}</p></div>)}
+        <div className="grid grid-cols-4 gap-2">{[100, 500, 1000, 5000].map(amount => (<button key={amount} onClick={() => setAmountReceived(amount)} className="py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 text-sm">{amount}</button>))}</div>
+        <button onClick={() => processSale(paymentMethod)} disabled={amountReceived < grandTotal} className="w-full py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed">Complete Sale</button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Receipt Modal */}
       {showReceiptModal && lastSale && (

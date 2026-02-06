@@ -11,6 +11,7 @@ export default function Purchases() {
   const [showViewModal, setShowViewModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showProductModal, setShowProductModal] = useState(false)
+  const [showSupplierModal, setShowSupplierModal] = useState(false) // NEW: Supplier modal state
   const [selectedPurchase, setSelectedPurchase] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -47,6 +48,20 @@ export default function Purchases() {
     alertQuantity: 5,
     expiryDate: '',
     description: ''
+  })
+
+  // NEW: Supplier Form Data
+  const [newSupplierData, setNewSupplierData] = useState({
+    contactType: 'supplier',
+    businessType: 'business',
+    businessName: '',
+    name: '',
+    phone: '',
+    email: '',
+    taxNumber: '',
+    payTerm: '',
+    openingBalance: 0,
+    address: ''
   })
 
   // Filter active payment accounts
@@ -174,6 +189,22 @@ export default function Purchases() {
     })
   }
 
+  // NEW: Reset Supplier Form
+  function resetSupplierForm() {
+    setNewSupplierData({
+      contactType: 'supplier',
+      businessType: 'business',
+      businessName: '',
+      name: '',
+      phone: '',
+      email: '',
+      taxNumber: '',
+      payTerm: '',
+      openingBalance: 0,
+      address: ''
+    })
+  }
+
   function openAddModal() {
     resetForm()
     setShowModal(true)
@@ -183,6 +214,12 @@ export default function Purchases() {
     resetProductForm()
     setShowProductModal(true)
     setShowProductDropdown(false)
+  }
+
+  // NEW: Open Supplier Modal
+  function openSupplierModal() {
+    resetSupplierForm()
+    setShowSupplierModal(true)
   }
 
   function addProduct(product) {
@@ -293,6 +330,39 @@ export default function Purchases() {
 
     setShowProductModal(false)
     resetProductForm()
+  }
+
+  // NEW: Handle Supplier Submit
+  function handleSupplierSubmit(e) {
+    e.preventDefault()
+    
+    if (!newSupplierData.name && !newSupplierData.businessName) {
+      alert('Name or Business Name is required')
+      return
+    }
+    if (!newSupplierData.phone) {
+      alert('Mobile number is required')
+      return
+    }
+
+    const newSupplier = {
+      ...newSupplierData,
+      openingBalance: parseFloat(newSupplierData.openingBalance) || 0,
+      balance: parseFloat(newSupplierData.openingBalance) || 0,
+      status: 'active',
+      id: Date.now()
+    }
+
+    dispatch({ type: 'ADD_SUPPLIER', payload: newSupplier })
+
+    // Auto-select the new supplier in the form
+    setFormData({
+      ...formData,
+      supplierId: newSupplier.id.toString()
+    })
+
+    setShowSupplierModal(false)
+    resetSupplierForm()
   }
 
   function handleSubmit(e) {
@@ -603,19 +673,32 @@ export default function Purchases() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* UPDATED: Supplier Field with + Button */}
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Supplier *</label>
-                    <select
-                      value={formData.supplierId}
-                      onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
-                      required
-                    >
-                      <option value="">Select Supplier</option>
-                      {suppliers.map(s => (
-                        <option key={s.id} value={s.id}>{s.businessName || s.name}</option>
-                      ))}
-                    </select>
+                    <div className="flex gap-2">
+                      <select
+                        value={formData.supplierId}
+                        onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+                        className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                        required
+                      >
+                        <option value="">Select Supplier</option>
+                        {suppliers.map(s => (
+                          <option key={s.id} value={s.id}>{s.businessName || s.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={openSupplierModal}
+                        className="px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+                        title="Add New Supplier"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Reference No</label>
@@ -964,6 +1047,178 @@ export default function Purchases() {
                     className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Save Purchase
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Quick Add Supplier Modal */}
+      {showSupplierModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-emerald-600 to-cyan-600">
+              <div>
+                <h2 className="text-lg font-bold text-white">Quick Add Supplier</h2>
+                <p className="text-emerald-100 text-sm">Create supplier and add to purchase</p>
+              </div>
+              <button onClick={() => setShowSupplierModal(false)} className="text-white/80 hover:text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4">
+              <form onSubmit={handleSupplierSubmit} className="space-y-4">
+                {/* Business Type */}
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-slate-300">
+                    <input 
+                      type="radio" 
+                      name="supplierBusinessType" 
+                      value="individual" 
+                      checked={newSupplierData.businessType === 'individual'} 
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, businessType: e.target.value })} 
+                      className="text-emerald-500" 
+                    />
+                    Individual
+                  </label>
+                  <label className="flex items-center gap-2 text-slate-300">
+                    <input 
+                      type="radio" 
+                      name="supplierBusinessType" 
+                      value="business" 
+                      checked={newSupplierData.businessType === 'business'} 
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, businessType: e.target.value })} 
+                      className="text-emerald-500" 
+                    />
+                    Business
+                  </label>
+                </div>
+
+                {/* Business Name (if business type) */}
+                {newSupplierData.businessType === 'business' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Business Name</label>
+                    <input
+                      type="text"
+                      value={newSupplierData.businessName}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, businessName: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="Business Name"
+                    />
+                  </div>
+                )}
+
+                {/* Name & Phone */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Contact Name *</label>
+                    <input
+                      type="text"
+                      value={newSupplierData.name}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, name: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="Contact Name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Mobile *</label>
+                    <input
+                      type="text"
+                      value={newSupplierData.phone}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, phone: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="Mobile Number"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Email & Tax Number */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={newSupplierData.email}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, email: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="Email"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Tax Number</label>
+                    <input
+                      type="text"
+                      value={newSupplierData.taxNumber}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, taxNumber: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="Tax Number"
+                    />
+                  </div>
+                </div>
+
+                {/* Pay Term & Opening Balance */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Pay Term</label>
+                    <select
+                      value={newSupplierData.payTerm}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, payTerm: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                    >
+                      <option value="">Select Pay Term</option>
+                      <option value="Net 7">Net 7</option>
+                      <option value="Net 15">Net 15</option>
+                      <option value="Net 30">Net 30</option>
+                      <option value="Net 45">Net 45</option>
+                      <option value="Net 60">Net 60</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Opening Balance</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newSupplierData.openingBalance}
+                      onChange={(e) => setNewSupplierData({ ...newSupplierData, openingBalance: e.target.value })}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Address</label>
+                  <textarea
+                    value={newSupplierData.address}
+                    onChange={(e) => setNewSupplierData({ ...newSupplierData, address: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                    rows="2"
+                    placeholder="Address (optional)"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setShowSupplierModal(false)}
+                    className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
+                  >
+                    Create & Select
                   </button>
                 </div>
               </form>

@@ -14,7 +14,8 @@ export default function Layout({ children }) {
   // Get current page from URL
   const currentPage = location.pathname.replace('/', '') || 'dashboard'
   
-  const [expandedMenus, setExpandedMenus] = useState(['user-management', 'products', 'purchases', 'settings'])
+  // FIX 1: Start with empty array - no dropdowns open by default
+  const [expandedMenus, setExpandedMenus] = useState([])
 
   const menuItems = [
     { id: 'dashboard', name: 'Dashboard', icon: 'home' },
@@ -145,20 +146,22 @@ export default function Layout({ children }) {
     settings: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
   }
 
-  function toggleMenu(menuId) {
+  // FIX 2: Updated toggleMenu to prevent default behavior and stop propagation
+  function toggleMenu(e, menuId) {
+    e.preventDefault()
+    e.stopPropagation()
     setExpandedMenus(prev => prev.includes(menuId) ? prev.filter(id => id !== menuId) : [...prev, menuId])
   }
 
-  // Auto-expand parent menu
+  // FIX 4: Optimized useEffect - only expand parent of current page
   useEffect(() => {
-    menuItems.forEach(item => {
-      if (item.children) {
-        const isChildActive = item.children.some(c => c.id === currentPage)
-        if (isChildActive && !expandedMenus.includes(item.id)) {
-          setExpandedMenus(prev => [...prev, item.id])
-        }
-      }
-    })
+    const parentToExpand = menuItems.find(item => 
+      item.children?.some(c => c.id === currentPage)
+    )
+    if (parentToExpand && !expandedMenus.includes(parentToExpand.id)) {
+      setExpandedMenus(prev => [...prev, parentToExpand.id])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage])
 
   const navigateTo = (pageId) => navigate(`/${pageId}`)
@@ -191,8 +194,9 @@ export default function Layout({ children }) {
 
     return (
       <div>
+        {/* FIX 3: Updated onClick to pass event */}
         <button
-          onClick={() => hasChildren ? toggleMenu(item.id) : navigateTo(item.id)}
+          onClick={(e) => hasChildren ? toggleMenu(e, item.id) : navigateTo(item.id)}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive ? 'bg-emerald-500/10 text-emerald-500' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
         >
           {icons[item.icon]}
