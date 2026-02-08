@@ -558,11 +558,11 @@ export default function Products() {
         {/* Products Tab */}
         {activeTab === 'products' && (
           <>
-            {/* Filters */}
+            {/* Filters - FIXED: added id/name/aria-label to all filter controls */}
             <div className="p-4 border-b border-slate-700/50 flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-slate-400 text-sm">Show</span>
-                <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+                <select id="prodPageSize" name="prodPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
                   <option>25</option>
                   <option>50</option>
                   <option>100</option>
@@ -571,6 +571,9 @@ export default function Products() {
               </div>
               
               <select
+                id="prodFilterCategory"
+                name="prodFilterCategory"
+                aria-label="Filter by category"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
                 className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm"
@@ -582,6 +585,9 @@ export default function Products() {
               </select>
 
               <select
+                id="prodFilterBrand"
+                name="prodFilterBrand"
+                aria-label="Filter by brand"
                 value={filterBrand}
                 onChange={(e) => setFilterBrand(e.target.value)}
                 className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm"
@@ -593,6 +599,9 @@ export default function Products() {
               </select>
 
               <select
+                id="prodFilterExpiry"
+                name="prodFilterExpiry"
+                aria-label="Filter by expiry status"
                 value={filterExpiry}
                 onChange={(e) => setFilterExpiry(e.target.value)}
                 className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm"
@@ -608,6 +617,10 @@ export default function Products() {
 
               <div className="relative">
                 <input
+                  id="prodSearch"
+                  name="prodSearch"
+                  autoComplete="off"
+                  aria-label="Search products"
                   type="text"
                   placeholder="Search products..."
                   value={searchTerm}
@@ -859,7 +872,6 @@ export default function Products() {
         {activeTab === 'stock' && (
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Low Stock Alert */}
               <div className="bg-slate-900/50 rounded-xl p-4">
                 <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
                   <span className="text-red-400">⚠️</span> Low Stock Alert
@@ -883,7 +895,6 @@ export default function Products() {
                 )}
               </div>
 
-              {/* Stock Summary by Category */}
               <div className="bg-slate-900/50 rounded-xl p-4">
                 <h3 className="text-lg font-medium text-white mb-4">📊 Stock by Category</h3>
                 <div className="space-y-3">
@@ -942,7 +953,7 @@ export default function Products() {
         </>
       )}
 
-      {/* Add/Edit Product Modal */}
+      {/* Add/Edit Product Modal - FIXED: added id/name/htmlFor/autoComplete to all fields */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col">
@@ -962,8 +973,11 @@ export default function Products() {
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Product Name *</label>
+                    <label htmlFor="prodName" className="block text-sm font-medium text-slate-300 mb-2">Product Name *</label>
                     <input
+                      id="prodName"
+                      name="prodName"
+                      autoComplete="off"
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -973,8 +987,11 @@ export default function Products() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">SKU</label>
+                    <label htmlFor="prodSku" className="block text-sm font-medium text-slate-300 mb-2">SKU</label>
                     <input
+                      id="prodSku"
+                      name="prodSku"
+                      autoComplete="off"
                       type="text"
                       value={formData.sku}
                       onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
@@ -988,9 +1005,11 @@ export default function Products() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Category with + Button */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
+                    <label htmlFor="prodCategoryId" className="block text-sm font-medium text-slate-300 mb-2">Category</label>
                     <div className="flex gap-2">
                       <select
+                        id="prodCategoryId"
+                        name="prodCategoryId"
                         value={formData.categoryId}
                         onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                         className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1015,9 +1034,11 @@ export default function Products() {
                   
                   {/* Brand with + Button */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Brand</label>
+                    <label htmlFor="prodBrandId" className="block text-sm font-medium text-slate-300 mb-2">Brand</label>
                     <div className="flex gap-2">
                       <select
+                        id="prodBrandId"
+                        name="prodBrandId"
                         value={formData.brandId}
                         onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
                         className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1042,9 +1063,11 @@ export default function Products() {
                   
                   {/* Unit with + Button */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Unit *</label>
+                    <label htmlFor="prodUnitId" className="block text-sm font-medium text-slate-300 mb-2">Unit *</label>
                     <div className="flex gap-2">
                       <select
+                        id="prodUnitId"
+                        name="prodUnitId"
                         value={formData.unitId}
                         onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
                         className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1070,8 +1093,10 @@ export default function Products() {
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Barcode Type</label>
+                    <label htmlFor="prodBarcodeType" className="block text-sm font-medium text-slate-300 mb-2">Barcode Type</label>
                     <select
+                      id="prodBarcodeType"
+                      name="prodBarcodeType"
                       value={formData.barcodeType}
                       onChange={(e) => setFormData({ ...formData, barcodeType: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1084,8 +1109,10 @@ export default function Products() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Product Type</label>
+                    <label htmlFor="prodProductType" className="block text-sm font-medium text-slate-300 mb-2">Product Type</label>
                     <select
+                      id="prodProductType"
+                      name="prodProductType"
                       value={formData.productType}
                       onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1096,8 +1123,10 @@ export default function Products() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Tax Type</label>
+                    <label htmlFor="prodTaxType" className="block text-sm font-medium text-slate-300 mb-2">Tax Type</label>
                     <select
+                      id="prodTaxType"
+                      name="prodTaxType"
                       value={formData.taxType}
                       onChange={(e) => setFormData({ ...formData, taxType: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1108,8 +1137,11 @@ export default function Products() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Tax Rate (%)</label>
+                    <label htmlFor="prodTaxRate" className="block text-sm font-medium text-slate-300 mb-2">Tax Rate (%)</label>
                     <input
+                      id="prodTaxRate"
+                      name="prodTaxRate"
+                      autoComplete="off"
                       type="number"
                       min="0"
                       step="0.01"
@@ -1126,6 +1158,7 @@ export default function Products() {
                     <input
                       type="checkbox"
                       id="manageStock"
+                      name="manageStock"
                       checked={formData.manageStock}
                       onChange={(e) => setFormData({ ...formData, manageStock: e.target.checked })}
                       className="w-4 h-4 text-emerald-500 bg-slate-900 border-slate-700 rounded focus:ring-emerald-500"
@@ -1139,8 +1172,11 @@ export default function Products() {
                   {formData.manageStock && (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Alert Quantity</label>
+                        <label htmlFor="prodAlertQuantity" className="block text-sm font-medium text-slate-300 mb-2">Alert Quantity</label>
                         <input
+                          id="prodAlertQuantity"
+                          name="prodAlertQuantity"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.alertQuantity}
@@ -1150,8 +1186,11 @@ export default function Products() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Opening Stock</label>
+                        <label htmlFor="prodCurrentStock" className="block text-sm font-medium text-slate-300 mb-2">Opening Stock</label>
                         <input
+                          id="prodCurrentStock"
+                          name="prodCurrentStock"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.currentStock}
@@ -1165,13 +1204,15 @@ export default function Products() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label htmlFor="prodExpiryDate" className="block text-sm font-medium text-slate-300 mb-2">
                           <span className="flex items-center gap-1">
                             Expiry Date
                             <span className="text-yellow-400">⏰</span>
                           </span>
                         </label>
                         <input
+                          id="prodExpiryDate"
+                          name="prodExpiryDate"
                           type="date"
                           value={formData.expiryDate}
                           onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
@@ -1180,8 +1221,11 @@ export default function Products() {
                         <p className="text-xs text-slate-500 mt-1">Default expiry (can be overridden in purchases)</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Expiry Alert (Days)</label>
+                        <label htmlFor="prodExpiryAlertDays" className="block text-sm font-medium text-slate-300 mb-2">Expiry Alert (Days)</label>
                         <input
+                          id="prodExpiryAlertDays"
+                          name="prodExpiryAlertDays"
+                          autoComplete="off"
                           type="number"
                           min="1"
                           value={formData.expiryAlertDays}
@@ -1198,10 +1242,13 @@ export default function Products() {
                 {/* Pricing */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Cost Price (Purchase Price) *</label>
+                    <label htmlFor="prodCostPrice" className="block text-sm font-medium text-slate-300 mb-2">Cost Price (Purchase Price) *</label>
                     <div className="relative">
                       <span className="absolute left-4 top-2.5 text-slate-400">{business.currency}</span>
                       <input
+                        id="prodCostPrice"
+                        name="prodCostPrice"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         step="0.01"
@@ -1214,10 +1261,13 @@ export default function Products() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Selling Price *</label>
+                    <label htmlFor="prodSellingPrice" className="block text-sm font-medium text-slate-300 mb-2">Selling Price *</label>
                     <div className="relative">
                       <span className="absolute left-4 top-2.5 text-slate-400">{business.currency}</span>
                       <input
+                        id="prodSellingPrice"
+                        name="prodSellingPrice"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         step="0.01"
@@ -1238,8 +1288,11 @@ export default function Products() {
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Product Description</label>
+                  <label htmlFor="prodDescription" className="block text-sm font-medium text-slate-300 mb-2">Product Description</label>
                   <textarea
+                    id="prodDescription"
+                    name="prodDescription"
+                    autoComplete="off"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1270,7 +1323,7 @@ export default function Products() {
         </div>
       )}
 
-      {/* NEW: Quick Add Category Modal */}
+      {/* NEW: Quick Add Category Modal - FIXED: added id/name/htmlFor/autoComplete */}
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
@@ -1288,8 +1341,11 @@ export default function Products() {
             
             <form onSubmit={handleCategorySubmit} className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Category Name *</label>
+                <label htmlFor="qaCatName" className="block text-sm font-medium text-slate-300 mb-1">Category Name *</label>
                 <input
+                  id="qaCatName"
+                  name="qaCatName"
+                  autoComplete="off"
                   type="text"
                   value={newCategoryData.name}
                   onChange={(e) => setNewCategoryData({ ...newCategoryData, name: e.target.value })}
@@ -1299,8 +1355,11 @@ export default function Products() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Category Code</label>
+                <label htmlFor="qaCatCode" className="block text-sm font-medium text-slate-300 mb-1">Category Code</label>
                 <input
+                  id="qaCatCode"
+                  name="qaCatCode"
+                  autoComplete="off"
                   type="text"
                   value={newCategoryData.code}
                   onChange={(e) => setNewCategoryData({ ...newCategoryData, code: e.target.value })}
@@ -1309,8 +1368,10 @@ export default function Products() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <label htmlFor="qaCatDescription" className="block text-sm font-medium text-slate-300 mb-1">Description</label>
                 <textarea
+                  id="qaCatDescription"
+                  name="qaCatDescription"
                   value={newCategoryData.description}
                   onChange={(e) => setNewCategoryData({ ...newCategoryData, description: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1338,7 +1399,7 @@ export default function Products() {
         </div>
       )}
 
-      {/* NEW: Quick Add Brand Modal */}
+      {/* NEW: Quick Add Brand Modal - FIXED: added id/name/htmlFor/autoComplete */}
       {showBrandModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
@@ -1356,8 +1417,11 @@ export default function Products() {
             
             <form onSubmit={handleBrandSubmit} className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Brand Name *</label>
+                <label htmlFor="qaBrandName" className="block text-sm font-medium text-slate-300 mb-1">Brand Name *</label>
                 <input
+                  id="qaBrandName"
+                  name="qaBrandName"
+                  autoComplete="off"
                   type="text"
                   value={newBrandData.name}
                   onChange={(e) => setNewBrandData({ ...newBrandData, name: e.target.value })}
@@ -1367,8 +1431,11 @@ export default function Products() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <label htmlFor="qaBrandDescription" className="block text-sm font-medium text-slate-300 mb-1">Description</label>
                 <input
+                  id="qaBrandDescription"
+                  name="qaBrandDescription"
+                  autoComplete="off"
                   type="text"
                   value={newBrandData.description}
                   onChange={(e) => setNewBrandData({ ...newBrandData, description: e.target.value })}
@@ -1396,7 +1463,7 @@ export default function Products() {
         </div>
       )}
 
-      {/* NEW: Quick Add Unit Modal */}
+      {/* NEW: Quick Add Unit Modal - FIXED: added id/name/htmlFor/autoComplete */}
       {showUnitModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
@@ -1414,8 +1481,11 @@ export default function Products() {
             
             <form onSubmit={handleUnitSubmit} className="p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Unit Name *</label>
+                <label htmlFor="qaUnitName" className="block text-sm font-medium text-slate-300 mb-1">Unit Name *</label>
                 <input
+                  id="qaUnitName"
+                  name="qaUnitName"
+                  autoComplete="off"
                   type="text"
                   value={newUnitData.name}
                   onChange={(e) => setNewUnitData({ ...newUnitData, name: e.target.value })}
@@ -1425,8 +1495,11 @@ export default function Products() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Short Name *</label>
+                <label htmlFor="qaUnitShortName" className="block text-sm font-medium text-slate-300 mb-1">Short Name *</label>
                 <input
+                  id="qaUnitShortName"
+                  name="qaUnitShortName"
+                  autoComplete="off"
                   type="text"
                   value={newUnitData.shortName}
                   onChange={(e) => setNewUnitData({ ...newUnitData, shortName: e.target.value })}
@@ -1436,8 +1509,10 @@ export default function Products() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Allow Decimal</label>
+                <label htmlFor="qaUnitAllowDecimal" className="block text-sm font-medium text-slate-300 mb-1">Allow Decimal</label>
                 <select
+                  id="qaUnitAllowDecimal"
+                  name="qaUnitAllowDecimal"
                   value={newUnitData.allowDecimal ? 'yes' : 'no'}
                   onChange={(e) => setNewUnitData({ ...newUnitData, allowDecimal: e.target.value === 'yes' })}
                   className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

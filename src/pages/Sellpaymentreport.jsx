@@ -286,8 +286,8 @@ export default function SellPaymentReport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 print:hidden">
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Period</label>
-            <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="sprPeriod" className="block text-slate-400 text-sm mb-1">Period</label>
+            <select id="sprPeriod" name="sprPeriod" value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -305,27 +305,27 @@ export default function SellPaymentReport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Start Date</label>
-                <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="sprStartDate" className="block text-slate-400 text-sm mb-1">Start Date</label>
+                <input id="sprStartDate" name="sprStartDate" type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">End Date</label>
-                <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="sprEndDate" className="block text-slate-400 text-sm mb-1">End Date</label>
+                <input id="sprEndDate" name="sprEndDate" type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Customer</label>
-            <select value={selectedCustomer} onChange={(e) => setSelectedCustomer(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="sprCustomer" className="block text-slate-400 text-sm mb-1">Customer</label>
+            <select id="sprCustomer" name="sprCustomer" value={selectedCustomer} onChange={(e) => setSelectedCustomer(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Customers</option>
               {customers.map(c => <option key={c.id} value={c.id}>{c.name || c.customerName}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Status</label>
-            <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
+            <label htmlFor="sprStatus" className="block text-slate-400 text-sm mb-1">Status</label>
+            <select id="sprStatus" name="sprStatus" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
               <option value="partial">Partial</option>
@@ -334,16 +334,16 @@ export default function SellPaymentReport() {
           </div>
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Payment Method</label>
-            <select value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[130px]">
+            <label htmlFor="sprPaymentMethod" className="block text-slate-400 text-sm mb-1">Payment Method</label>
+            <select id="sprPaymentMethod" name="sprPaymentMethod" value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[130px]">
               {paymentMethods.map(m => <option key={m} value={m}>{m === 'all' ? 'All Methods' : m}</option>)}
             </select>
           </div>
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-slate-400 text-sm mb-1">Search</label>
+            <label htmlFor="sprSearch" className="block text-slate-400 text-sm mb-1">Search</label>
             <div className="relative">
-              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search invoice or customer..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+              <input id="sprSearch" name="sprSearch" autoComplete="off" type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search invoice or customer..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
           </div>

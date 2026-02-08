@@ -134,7 +134,6 @@ export default function POS() {
       subtotal: (item.sellingPrice * item.quantity) - item.discount
     }))
 
-    // Find or use selected payment account
     const selectedAccountId = paymentAccountId 
       ? parseInt(paymentAccountId) 
       : activeAccounts.find(a => a.accountType === 'Cash')?.id || activeAccounts[0]?.id || null
@@ -185,7 +184,6 @@ export default function POS() {
       return
     }
     setAmountReceived(grandTotal)
-    // Set default payment account (first Cash account or first available)
     const defaultAccount = activeAccounts.find(a => a.accountType === 'Cash') || activeAccounts[0]
     setPaymentAccountId(defaultAccount?.id?.toString() || '')
     setShowPaymentModal(true)
@@ -220,6 +218,9 @@ export default function POS() {
                   </svg>
                 </div>
                 <select
+                  id="posCustomerId"
+                  name="posCustomerId"
+                  aria-label="Select customer"
                   value={selectedCustomer?.id || ''}
                   onChange={(e) => setSelectedCustomer(customers.find(c => c.id === parseInt(e.target.value)))}
                   className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -238,11 +239,14 @@ export default function POS() {
             </div>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <select value={salesAgent} onChange={(e) => setSalesAgent(e.target.value)} className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
+            <select id="posSalesAgentId" name="posSalesAgentId" aria-label="Commission agent" value={salesAgent} onChange={(e) => setSalesAgent(e.target.value)} className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500">
               <option value="">Commission Agent</option>
               {(salesAgents || []).map(agent => (<option key={agent.id} value={agent.id}>{agent.name}</option>))}
             </select>
-            <select 
+            <select
+              id="posPaymentAccountId"
+              name="posPaymentAccountId"
+              aria-label="Payment account"
               value={paymentAccountId} 
               onChange={(e) => setPaymentAccountId(e.target.value)} 
               className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -291,15 +295,15 @@ export default function POS() {
                       <td className="py-3">
                         <div className="flex items-center justify-center gap-1">
                           <button onClick={() => updateQuantity(item.productId, item.quantity - 1)} className="w-8 h-8 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 flex items-center justify-center">−</button>
-                          <input type="number" value={item.quantity} onChange={(e) => updateQuantity(item.productId, parseInt(e.target.value) || 0)} className="w-16 text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-white" />
+                          <input aria-label={`Quantity for ${item.name}`} type="number" value={item.quantity} onChange={(e) => updateQuantity(item.productId, parseInt(e.target.value) || 0)} className="w-16 text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-white" />
                           <button onClick={() => updateQuantity(item.productId, item.quantity + 1)} className="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 flex items-center justify-center">+</button>
                         </div>
                       </td>
                       <td className="py-3">
-                        <input type="number" value={item.sellingPrice} onChange={(e) => updatePrice(item.productId, e.target.value)} className="w-full text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-white" />
+                        <input aria-label={`Price for ${item.name}`} type="number" value={item.sellingPrice} onChange={(e) => updatePrice(item.productId, e.target.value)} className="w-full text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-white" />
                       </td>
                       <td className="py-3">
-                        <input type="number" value={item.discount} onChange={(e) => updateItemDiscount(item.productId, e.target.value)} className="w-full text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-emerald-400" placeholder="0" />
+                        <input aria-label={`Discount for ${item.name}`} type="number" value={item.discount} onChange={(e) => updateItemDiscount(item.productId, e.target.value)} className="w-full text-center bg-slate-700 border border-slate-600 rounded-lg px-2 py-1 text-emerald-400" placeholder="0" />
                       </td>
                       <td className="py-3 text-right text-white font-medium">{business.currency} {itemSubtotal.toFixed(2)}</td>
                       <td className="py-3">
@@ -351,7 +355,7 @@ export default function POS() {
         <div className="p-4 border-b border-slate-700/50">
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input ref={searchRef} type="text" placeholder="Search products... (F2)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" />
+            <input id="posProductSearch" name="posProductSearch" autoComplete="off" aria-label="Search products" ref={searchRef} type="text" placeholder="Search products... (F2)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" />
           </div>
         </div>
 
@@ -385,8 +389,8 @@ export default function POS() {
           {filteredProducts.length === 0 && (<div className="text-center py-8 text-slate-500">No products found</div>)}
         </div>
       </div>
-      
-      {/* Payment Modal */}
+
+    {/* Payment Modal */}
 {showPaymentModal && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
     <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md max-h-[90vh] overflow-auto">
@@ -400,16 +404,18 @@ export default function POS() {
           <p className="text-2xl font-bold text-white">{business.currency} {grandTotal.toFixed(2)}</p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Payment Method</label>
-          <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm">
+          <label htmlFor="posPayMethod" className="block text-sm font-medium text-slate-300 mb-1">Payment Method</label>
+          <select id="posPayMethod" name="posPayMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm">
             <option value="Cash">Cash</option>
             <option value="Card">Card</option>
             <option value="Bank Transfer">Bank Transfer</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Payment Account *</label>
-          <select 
+          <label htmlFor="posPayAccountId" className="block text-sm font-medium text-slate-300 mb-1">Payment Account *</label>
+          <select
+            id="posPayAccountId"
+            name="posPayAccountId"
             value={paymentAccountId} 
             onChange={(e) => setPaymentAccountId(e.target.value)} 
             className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm"
@@ -424,8 +430,8 @@ export default function POS() {
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-1">Amount Received</label>
-          <input type="number" value={amountReceived} onChange={(e) => setAmountReceived(parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg font-bold" />
+          <label htmlFor="posPayAmountReceived" className="block text-sm font-medium text-slate-300 mb-1">Amount Received</label>
+          <input id="posPayAmountReceived" name="posPayAmountReceived" autoComplete="off" type="number" value={amountReceived} onChange={(e) => setAmountReceived(parseFloat(e.target.value) || 0)} className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-lg font-bold" />
         </div>
         {changeAmount >= 0 && (<div className="p-3 bg-emerald-500/20 rounded-lg"><p className="text-emerald-400 text-xs">Change</p><p className="text-xl font-bold text-emerald-400">{business.currency} {changeAmount.toFixed(2)}</p></div>)}
         {changeAmount < 0 && (<div className="p-3 bg-red-500/20 rounded-lg"><p className="text-red-400 text-xs">Due Amount</p><p className="text-xl font-bold text-red-400">{business.currency} {Math.abs(changeAmount).toFixed(2)}</p></div>)}
@@ -482,10 +488,10 @@ export default function POS() {
               <h2 className="text-xl font-bold text-white">Quick Add Customer</h2>
               <button onClick={() => setShowCustomerModal(false)} className="text-slate-400 hover:text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); dispatch({ type: 'ADD_CUSTOMER', payload: { name: fd.get('name'), phone: fd.get('phone'), email: fd.get('email') || '', address: '', businessType: 'individual', status: 'active' } }); setShowCustomerModal(false) }} className="p-6 space-y-4">
-              <div><label className="block text-sm font-medium text-slate-300 mb-2">Name *</label><input type="text" name="name" required className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
-              <div><label className="block text-sm font-medium text-slate-300 mb-2">Mobile *</label><input type="text" name="phone" required className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
-              <div><label className="block text-sm font-medium text-slate-300 mb-2">Email</label><input type="email" name="email" className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
+            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); dispatch({ type: 'ADD_CUSTOMER', payload: { name: fd.get('posQaCustName'), phone: fd.get('posQaCustPhone'), email: fd.get('posQaCustEmail') || '', address: '', businessType: 'individual', status: 'active' } }); setShowCustomerModal(false) }} className="p-6 space-y-4">
+              <div><label htmlFor="posQaCustName" className="block text-sm font-medium text-slate-300 mb-2">Name *</label><input id="posQaCustName" name="posQaCustName" autoComplete="name" type="text" required className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
+              <div><label htmlFor="posQaCustPhone" className="block text-sm font-medium text-slate-300 mb-2">Mobile *</label><input id="posQaCustPhone" name="posQaCustPhone" autoComplete="tel" type="text" required className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
+              <div><label htmlFor="posQaCustEmail" className="block text-sm font-medium text-slate-300 mb-2">Email</label><input id="posQaCustEmail" name="posQaCustEmail" autoComplete="email" type="email" className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
               <div className="flex justify-end gap-3 pt-4"><button type="button" onClick={() => setShowCustomerModal(false)} className="px-4 py-2 bg-slate-700 text-white rounded-lg">Cancel</button><button type="submit" className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg">Add</button></div>
             </form>
           </div>

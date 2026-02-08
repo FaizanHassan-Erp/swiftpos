@@ -89,7 +89,7 @@ export default function Categories() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="catPageSize" name="catPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -98,6 +98,10 @@ export default function Categories() {
           </div>
           <div className="relative">
             <input
+              id="catSearch"
+              name="catSearch"
+              autoComplete="off"
+              aria-label="Search categories"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -175,8 +179,11 @@ export default function Categories() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Category Name *</label>
+                <label htmlFor="catName" className="block text-sm font-medium text-slate-300 mb-2">Category Name *</label>
                 <input
+                  id="catName"
+                  name="catName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -187,8 +194,11 @@ export default function Categories() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Category Code</label>
+                <label htmlFor="catCode" className="block text-sm font-medium text-slate-300 mb-2">Category Code</label>
                 <input
+                  id="catCode"
+                  name="catCode"
+                  autoComplete="off"
                   type="text"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
@@ -199,8 +209,10 @@ export default function Categories() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                <label htmlFor="catDescription" className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                 <textarea
+                  id="catDescription"
+                  name="catDescription"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -212,6 +224,8 @@ export default function Categories() {
               <div>
                 <label className="flex items-center gap-2 text-slate-300">
                   <input
+                    id="catSubTaxonomy"
+                    name="catSubTaxonomy"
                     type="checkbox"
                     checked={formData.parentId !== null}
                     onChange={(e) => setFormData({ ...formData, parentId: e.target.checked ? '' : null })}
@@ -223,8 +237,10 @@ export default function Categories() {
 
               {formData.parentId !== null && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Parent Category</label>
+                  <label htmlFor="catParentId" className="block text-sm font-medium text-slate-300 mb-2">Parent Category</label>
                   <select
+                    id="catParentId"
+                    name="catParentId"
                     value={formData.parentId || ''}
                     onChange={(e) => setFormData({ ...formData, parentId: e.target.value ? parseInt(e.target.value) : null })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

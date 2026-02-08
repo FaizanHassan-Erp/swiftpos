@@ -425,6 +425,9 @@ export default function Stockexpiryreport() {
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-3">
             <select
+              id="serFilterDays"
+              name="serFilterDays"
+              aria-label="Filter by expiry date range"
               value={filterDays}
               onChange={(e) => setFilterDays(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -438,6 +441,9 @@ export default function Stockexpiryreport() {
             </select>
 
             <select
+              id="serFilterStatus"
+              name="serFilterStatus"
+              aria-label="Filter by expiry status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -451,6 +457,9 @@ export default function Stockexpiryreport() {
             </select>
 
             <select
+              id="serFilterCategory"
+              name="serFilterCategory"
+              aria-label="Filter by category"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -462,6 +471,9 @@ export default function Stockexpiryreport() {
             </select>
 
             <select
+              id="serFilterBrand"
+              name="serFilterBrand"
+              aria-label="Filter by brand"
               value={filterBrand}
               onChange={(e) => setFilterBrand(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -476,6 +488,10 @@ export default function Stockexpiryreport() {
 
             <div className="relative">
               <input
+                id="serSearch"
+                name="serSearch"
+                autoComplete="off"
+                aria-label="Search stock expiry products"
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}

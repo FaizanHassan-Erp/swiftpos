@@ -281,8 +281,8 @@ export default function PurchasePaymentReport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 print:hidden">
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Period</label>
-            <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="ppDateRange" className="block text-slate-400 text-sm mb-1">Period</label>
+            <select id="ppDateRange" name="ppDateRange" value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -300,27 +300,27 @@ export default function PurchasePaymentReport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Start Date</label>
-                <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="ppStartDate" className="block text-slate-400 text-sm mb-1">Start Date</label>
+                <input id="ppStartDate" name="ppStartDate" autoComplete="off" type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">End Date</label>
-                <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="ppEndDate" className="block text-slate-400 text-sm mb-1">End Date</label>
+                <input id="ppEndDate" name="ppEndDate" autoComplete="off" type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Supplier</label>
-            <select value={selectedSupplier} onChange={(e) => setSelectedSupplier(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="ppSupplier" className="block text-slate-400 text-sm mb-1">Supplier</label>
+            <select id="ppSupplier" name="ppSupplier" value={selectedSupplier} onChange={(e) => setSelectedSupplier(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Suppliers</option>
               {suppliers.map(s => <option key={s.id} value={s.id}>{s.businessName || s.name || s.companyName}</option>)}
             </select>
           </div>
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Status</label>
-            <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
+            <label htmlFor="ppStatus" className="block text-slate-400 text-sm mb-1">Status</label>
+            <select id="ppStatus" name="ppStatus" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
               <option value="partial">Partial</option>
@@ -329,16 +329,16 @@ export default function PurchasePaymentReport() {
           </div>
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Payment Method</label>
-            <select value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[130px]">
+            <label htmlFor="ppPaymentMethod" className="block text-slate-400 text-sm mb-1">Payment Method</label>
+            <select id="ppPaymentMethod" name="ppPaymentMethod" value={selectedPaymentMethod} onChange={(e) => setSelectedPaymentMethod(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[130px]">
               {paymentMethods.map(m => <option key={m} value={m}>{m === 'all' ? 'All Methods' : m}</option>)}
             </select>
           </div>
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-slate-400 text-sm mb-1">Search</label>
+            <label htmlFor="ppSearch" className="block text-slate-400 text-sm mb-1">Search</label>
             <div className="relative">
-              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search PO or supplier..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+              <input id="ppSearch" name="ppSearch" autoComplete="off" type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search PO or supplier..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
           </div>

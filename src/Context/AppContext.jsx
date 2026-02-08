@@ -71,6 +71,19 @@ const emptyState = {
   saleReturns: [],
   purchaseReturns: [],
   
+  // ===== NEWLY ADDED COLLECTIONS =====
+  salesAgents: [],
+  paymentAccounts: [],
+  taxRates: [],
+  roles: [],
+  activityLogs: [],
+  warranties: [],
+  expenseCategories: [],
+  accountTypes: [],
+  fundTransfers: [],
+  deposits: [],
+  registerSessions: [],
+  
   // Counters
   saleCounter: 1,
   purchaseCounter: 1,
@@ -119,13 +132,13 @@ function appReducer(state, action) {
     case 'ADD_PRODUCT':
       return { 
         ...state, 
-        products: [...state.products, action.payload]
+        products: [...(state.products || []), action.payload]
       }
     
     case 'UPDATE_PRODUCT':
       return { 
         ...state, 
-        products: state.products.map(p => 
+        products: (state.products || []).map(p => 
           p.id === action.payload.id ? { ...p, ...action.payload } : p
         )
       }
@@ -133,13 +146,13 @@ function appReducer(state, action) {
     case 'DELETE_PRODUCT':
       return { 
         ...state, 
-        products: state.products.filter(p => p.id !== action.payload)
+        products: (state.products || []).filter(p => p.id !== action.payload)
       }
     
     case 'UPDATE_STOCK':
       return { 
         ...state, 
-        products: state.products.map(p => 
+        products: (state.products || []).map(p => 
           p.id === action.payload.id 
             ? { ...p, currentStock: (p.currentStock || 0) + action.payload.quantity } 
             : p
@@ -147,72 +160,162 @@ function appReducer(state, action) {
       }
     
     case 'SET_PRODUCTS':
-      return { ...state, products: action.payload }
+      return { ...state, products: action.payload || [] }
 
     // ============== CATEGORIES ==============
     case 'ADD_CATEGORY':
-      return { ...state, categories: [...state.categories, action.payload] }
+      return { ...state, categories: [...(state.categories || []), action.payload] }
     
     case 'UPDATE_CATEGORY':
       return { 
         ...state, 
-        categories: state.categories.map(c => 
+        categories: (state.categories || []).map(c => 
           c.id === action.payload.id ? action.payload : c
         )
       }
     
     case 'DELETE_CATEGORY':
-      return { ...state, categories: state.categories.filter(c => c.id !== action.payload) }
+      return { ...state, categories: (state.categories || []).filter(c => c.id !== action.payload) }
 
     // ============== BRANDS ==============
     case 'ADD_BRAND':
-      return { ...state, brands: [...state.brands, action.payload] }
+      return { ...state, brands: [...(state.brands || []), action.payload] }
     
     case 'UPDATE_BRAND':
       return { 
         ...state, 
-        brands: state.brands.map(b => b.id === action.payload.id ? action.payload : b)
+        brands: (state.brands || []).map(b => b.id === action.payload.id ? action.payload : b)
       }
     
     case 'DELETE_BRAND':
-      return { ...state, brands: state.brands.filter(b => b.id !== action.payload) }
+      return { ...state, brands: (state.brands || []).filter(b => b.id !== action.payload) }
 
     // ============== UNITS ==============
     case 'ADD_UNIT':
-      return { ...state, units: [...state.units, action.payload] }
+      return { ...state, units: [...(state.units || []), action.payload] }
     
     case 'UPDATE_UNIT':
       return { 
         ...state, 
-        units: state.units.map(u => u.id === action.payload.id ? action.payload : u)
+        units: (state.units || []).map(u => u.id === action.payload.id ? action.payload : u)
       }
     
     case 'DELETE_UNIT':
-      return { ...state, units: state.units.filter(u => u.id !== action.payload) }
+      return { ...state, units: (state.units || []).filter(u => u.id !== action.payload) }
+
+    // ============== WARRANTIES ==============
+    case 'ADD_WARRANTY':
+      return { ...state, warranties: [...(state.warranties || []), action.payload] }
+    
+    case 'UPDATE_WARRANTY':
+      return { 
+        ...state, 
+        warranties: (state.warranties || []).map(w => w.id === action.payload.id ? action.payload : w)
+      }
+    
+    case 'DELETE_WARRANTY':
+      return { ...state, warranties: (state.warranties || []).filter(w => w.id !== action.payload) }
+
+    // ============== EXPENSE CATEGORIES ==============
+    case 'ADD_EXPENSE_CATEGORY':
+      return { ...state, expenseCategories: [...(state.expenseCategories || []), action.payload] }
+    
+    case 'UPDATE_EXPENSE_CATEGORY':
+      return { 
+        ...state, 
+        expenseCategories: (state.expenseCategories || []).map(c => 
+          c.id === action.payload.id ? { ...c, ...action.payload } : c
+        )
+      }
+    
+    case 'DELETE_EXPENSE_CATEGORY':
+      return { ...state, expenseCategories: (state.expenseCategories || []).filter(c => c.id !== action.payload) }
+
+    // ============== ACCOUNT TYPES ==============
+    case 'ADD_ACCOUNT_TYPE':
+      return { ...state, accountTypes: [...(state.accountTypes || []), action.payload] }
+    
+    case 'UPDATE_ACCOUNT_TYPE':
+      return { 
+        ...state, 
+        accountTypes: (state.accountTypes || []).map(t => 
+          t.id === action.payload.id ? { ...t, ...action.payload } : t
+        )
+      }
+    
+    case 'DELETE_ACCOUNT_TYPE':
+      return { ...state, accountTypes: (state.accountTypes || []).filter(t => t.id !== action.payload) }
+
+    // ============== FUND TRANSFERS ==============
+    case 'ADD_FUND_TRANSFER':
+      return { ...state, fundTransfers: [...(state.fundTransfers || []), action.payload] }
+
+    // ============== DEPOSITS ==============
+    case 'ADD_DEPOSIT':
+      return { ...state, deposits: [...(state.deposits || []), action.payload] }
+
+    // ============== REGISTER SESSIONS ==============
+    case 'OPEN_REGISTER_SESSION':
+      return { ...state, registerSessions: [...(state.registerSessions || []), action.payload] }
+
+    case 'CLOSE_REGISTER_SESSION':
+      return {
+        ...state,
+        registerSessions: (state.registerSessions || []).map(s =>
+          String(s.id) === String(action.payload.id) ? { ...s, ...action.payload } : s
+        )
+      }
+
+    case 'ADD_CASH_MOVEMENT': {
+      const { sessionId, movement } = action.payload
+      return {
+        ...state,
+        registerSessions: (state.registerSessions || []).map(s =>
+          String(s.id) === String(sessionId)
+            ? { ...s, cashMovements: [...(s.cashMovements || []), movement] }
+            : s
+        )
+      }
+    }
+
+    case 'UPDATE_REGISTER_SESSION': {
+      const { _tempId, ...updateData } = action.payload
+      return {
+        ...state,
+        registerSessions: (state.registerSessions || []).map(s => {
+          const matchById = s.id !== undefined && s.id !== null && String(s.id) === String(updateData.id)
+          const matchByTempId = _tempId && s.id !== undefined && s.id !== null && String(s.id) === String(_tempId)
+          if (matchById || matchByTempId) {
+            return { ...s, ...updateData }
+          }
+          return s
+        })
+      }
+    }
 
     // ============== CUSTOMERS ==============
     case 'ADD_CUSTOMER':
       return { 
         ...state, 
-        customers: [...state.customers, action.payload],
-        customerIdCounter: state.customerIdCounter + 1
+        customers: [...(state.customers || []), action.payload],
+        customerIdCounter: (state.customerIdCounter || 0) + 1
       }
     
     case 'UPDATE_CUSTOMER':
       return { 
         ...state, 
-        customers: state.customers.map(c => 
+        customers: (state.customers || []).map(c => 
           c.id === action.payload.id ? { ...c, ...action.payload } : c
         )
       }
     
     case 'DELETE_CUSTOMER':
-      return { ...state, customers: state.customers.filter(c => c.id !== action.payload) }
+      return { ...state, customers: (state.customers || []).filter(c => c.id !== action.payload) }
     
     case 'UPDATE_CUSTOMER_BALANCE':
       return { 
         ...state, 
-        customers: state.customers.map(c => 
+        customers: (state.customers || []).map(c => 
           c.id === action.payload.id 
             ? { ...c, balance: (c.balance || 0) + action.payload.amount } 
             : c
@@ -223,44 +326,136 @@ function appReducer(state, action) {
     case 'ADD_SUPPLIER':
       return { 
         ...state, 
-        suppliers: [...state.suppliers, action.payload],
-        contactIdCounter: state.contactIdCounter + 1
+        suppliers: [...(state.suppliers || []), action.payload],
+        contactIdCounter: (state.contactIdCounter || 0) + 1
       }
     
     case 'UPDATE_SUPPLIER':
       return { 
         ...state, 
-        suppliers: state.suppliers.map(s => 
+        suppliers: (state.suppliers || []).map(s => 
           s.id === action.payload.id ? { ...s, ...action.payload } : s
         )
       }
     
     case 'DELETE_SUPPLIER':
-      return { ...state, suppliers: state.suppliers.filter(s => s.id !== action.payload) }
+      return { ...state, suppliers: (state.suppliers || []).filter(s => s.id !== action.payload) }
     
     case 'UPDATE_SUPPLIER_BALANCE':
       return { 
         ...state, 
-        suppliers: state.suppliers.map(s => 
+        suppliers: (state.suppliers || []).map(s => 
           s.id === action.payload.id 
             ? { ...s, balance: (s.balance || 0) + action.payload.amount } 
             : s
         )
       }
 
+    // ============== SALES AGENTS ==============
+    case 'ADD_SALES_AGENT':
+      return { ...state, salesAgents: [...(state.salesAgents || []), action.payload] }
+    
+    case 'UPDATE_SALES_AGENT': {
+      const { _tempId, ...updateData } = action.payload
+      return { 
+        ...state, 
+        salesAgents: (state.salesAgents || []).map(a => {
+          const matchById = a.id !== undefined && a.id !== null && String(a.id) === String(updateData.id)
+          const matchByTempId = _tempId && a.id !== undefined && a.id !== null && String(a.id) === String(_tempId)
+          if (matchById || matchByTempId) return { ...a, ...updateData }
+          return a
+        })
+      }
+    }
+    
+    case 'DELETE_SALES_AGENT':
+      return { ...state, salesAgents: (state.salesAgents || []).filter(a => a.id !== action.payload) }
+
+    // ============== PAYMENT ACCOUNTS ==============
+    case 'ADD_PAYMENT_ACCOUNT':
+      return { ...state, paymentAccounts: [...(state.paymentAccounts || []), action.payload] }
+    
+    case 'UPDATE_PAYMENT_ACCOUNT': {
+      const { _tempId, ...updateData } = action.payload
+      return { 
+        ...state, 
+        paymentAccounts: (state.paymentAccounts || []).map(a => {
+          // Match by current ID OR by temp ID (for newly added accounts)
+          const matchById = a.id !== undefined && a.id !== null && String(a.id) === String(updateData.id)
+          const matchByTempId = _tempId && a.id !== undefined && a.id !== null && String(a.id) === String(_tempId)
+          if (matchById || matchByTempId) {
+            return { ...a, ...updateData }
+          }
+          return a
+        })
+      }
+    }
+    
+    case 'DELETE_PAYMENT_ACCOUNT':
+      return { ...state, paymentAccounts: (state.paymentAccounts || []).filter(a => a.id !== action.payload) }
+    
+    case 'UPDATE_ACCOUNT_BALANCE':
+      return {
+        ...state,
+        paymentAccounts: (state.paymentAccounts || []).map(a =>
+          a.id === action.payload.id
+            ? { ...a, balance: (a.balance || 0) + action.payload.amount }
+            : a
+        )
+      }
+
+    // ============== TAX RATES ==============
+    case 'ADD_TAX_RATE':
+      return { ...state, taxRates: [...(state.taxRates || []), action.payload] }
+    
+    case 'UPDATE_TAX_RATE':
+      return { 
+        ...state, 
+        taxRates: (state.taxRates || []).map(t => 
+          t.id === action.payload.id ? { ...t, ...action.payload } : t
+        )
+      }
+    
+    case 'DELETE_TAX_RATE':
+      return { ...state, taxRates: (state.taxRates || []).filter(t => t.id !== action.payload) }
+
+    // ============== ROLES ==============
+    case 'ADD_ROLE':
+      return { ...state, roles: [...(state.roles || []), action.payload] }
+    
+    case 'UPDATE_ROLE': {
+      const { _tempId, ...updateData } = action.payload
+      return { 
+        ...state, 
+        roles: (state.roles || []).map(r => {
+          const matchById = r.id !== undefined && r.id !== null && String(r.id) === String(updateData.id)
+          const matchByTempId = _tempId && r.id !== undefined && r.id !== null && String(r.id) === String(_tempId)
+          if (matchById || matchByTempId) return { ...r, ...updateData }
+          return r
+        })
+      }
+    }
+    
+    case 'DELETE_ROLE':
+      return { ...state, roles: (state.roles || []).filter(r => r.id !== action.payload) }
+
+    // ============== ACTIVITY LOGS ==============
+    case 'ADD_ACTIVITY_LOG':
+      return { ...state, activityLogs: [...(state.activityLogs || []), action.payload] }
+
     // ============== SALES ==============
     case 'ADD_SALE': {
       const sale = action.payload
       // Update product stock (reduce)
-      const updatedProducts = state.products.map(p => {
-        const saleItem = sale.items?.find(item => item.productId === p.id)
+      const updatedProducts = (state.products || []).map(p => {
+        const saleItem = (sale.items || []).find(item => item.productId === p.id)
         if (saleItem) {
           return { ...p, currentStock: (p.currentStock || 0) - saleItem.quantity }
         }
         return p
       })
       // Update customer balance
-      const updatedCustomers = state.customers.map(c => {
+      const updatedCustomers = (state.customers || []).map(c => {
         if (c.id === sale.customerId) {
           const balanceToAdd = (sale.total || 0) - (sale.amountPaid || 0)
           return { ...c, balance: (c.balance || 0) + balanceToAdd }
@@ -269,28 +464,28 @@ function appReducer(state, action) {
       })
       return { 
         ...state, 
-        sales: [...state.sales, sale],
+        sales: [...(state.sales || []), sale],
         products: updatedProducts,
         customers: updatedCustomers,
-        saleCounter: state.saleCounter + 1
+        saleCounter: (state.saleCounter || 0) + 1
       }
     }
     
     case 'UPDATE_SALE':
       return { 
         ...state, 
-        sales: state.sales.map(s => 
+        sales: (state.sales || []).map(s => 
           s.id === action.payload.id ? { ...s, ...action.payload } : s
         )
       }
     
     case 'DELETE_SALE': {
-      const sale = state.sales.find(s => s.id === action.payload)
+      const sale = (state.sales || []).find(s => s.id === action.payload)
       if (!sale) return state
       
       // Restore product stock
-      const restoredProducts = state.products.map(p => {
-        const saleItem = sale.items?.find(item => item.productId === p.id)
+      const restoredProducts = (state.products || []).map(p => {
+        const saleItem = (sale.items || []).find(item => item.productId === p.id)
         if (saleItem) {
           return { ...p, currentStock: (p.currentStock || 0) + saleItem.quantity }
         }
@@ -299,7 +494,7 @@ function appReducer(state, action) {
       // Update customer balance
       const paid = sale.amountPaid || 0
       const saleDue = (sale.total || 0) - paid
-      const updatedCustomers = state.customers.map(c => {
+      const updatedCustomers = (state.customers || []).map(c => {
         if (c.id === sale.customerId) {
           return { ...c, balance: Math.max(0, (c.balance || 0) - saleDue) }
         }
@@ -307,25 +502,54 @@ function appReducer(state, action) {
       })
       return { 
         ...state, 
-        sales: state.sales.filter(s => s.id !== action.payload),
+        sales: (state.sales || []).filter(s => s.id !== action.payload),
         products: restoredProducts,
         customers: updatedCustomers
       }
     }
 
+    // ============== SALE RETURNS ==============
+    case 'ADD_SALE_RETURN': {
+      const saleReturn = action.payload
+      // Restore product stock
+      const updatedProducts = (state.products || []).map(p => {
+        const returnItem = (saleReturn.items || []).find(item => item.productId === p.id)
+        if (returnItem) {
+          return { ...p, currentStock: (p.currentStock || 0) + returnItem.quantity }
+        }
+        return p
+      })
+      return {
+        ...state,
+        saleReturns: [...(state.saleReturns || []), saleReturn],
+        products: updatedProducts
+      }
+    }
+
+    case 'UPDATE_SALE_RETURN':
+      return {
+        ...state,
+        saleReturns: (state.saleReturns || []).map(r =>
+          r.id === action.payload.id ? { ...r, ...action.payload } : r
+        )
+      }
+
+    case 'DELETE_SALE_RETURN':
+      return { ...state, saleReturns: (state.saleReturns || []).filter(r => r.id !== action.payload) }
+
     // ============== PURCHASES ==============
     case 'ADD_PURCHASE': {
       const purchase = action.payload
       // Update product stock (increase)
-      const updatedProducts = state.products.map(p => {
-        const purchaseItem = purchase.items?.find(item => item.productId === p.id)
+      const updatedProducts = (state.products || []).map(p => {
+        const purchaseItem = (purchase.items || []).find(item => item.productId === p.id)
         if (purchaseItem) {
           return { ...p, currentStock: (p.currentStock || 0) + purchaseItem.quantity }
         }
         return p
       })
       // Update supplier balance
-      const updatedSuppliers = state.suppliers.map(s => {
+      const updatedSuppliers = (state.suppliers || []).map(s => {
         if (s.id === purchase.supplierId) {
           const balanceToAdd = (purchase.total || 0) - (purchase.amountPaid || 0)
           return { ...s, balance: (s.balance || 0) + balanceToAdd }
@@ -334,28 +558,28 @@ function appReducer(state, action) {
       })
       return { 
         ...state, 
-        purchases: [...state.purchases, purchase],
+        purchases: [...(state.purchases || []), purchase],
         products: updatedProducts,
         suppliers: updatedSuppliers,
-        purchaseCounter: state.purchaseCounter + 1
+        purchaseCounter: (state.purchaseCounter || 0) + 1
       }
     }
     
     case 'UPDATE_PURCHASE':
       return { 
         ...state, 
-        purchases: state.purchases.map(p => 
+        purchases: (state.purchases || []).map(p => 
           p.id === action.payload.id ? { ...p, ...action.payload } : p
         )
       }
     
     case 'DELETE_PURCHASE': {
-      const purchase = state.purchases.find(p => p.id === action.payload)
+      const purchase = (state.purchases || []).find(p => p.id === action.payload)
       if (!purchase) return state
       
       // Reduce product stock
-      const updatedProducts = state.products.map(p => {
-        const purchaseItem = purchase.items?.find(item => item.productId === p.id)
+      const updatedProducts = (state.products || []).map(p => {
+        const purchaseItem = (purchase.items || []).find(item => item.productId === p.id)
         if (purchaseItem) {
           return { ...p, currentStock: Math.max(0, (p.currentStock || 0) - purchaseItem.quantity) }
         }
@@ -364,7 +588,7 @@ function appReducer(state, action) {
       // Update supplier balance
       const paid = purchase.amountPaid || 0
       const purchaseDue = (purchase.total || 0) - paid
-      const updatedSuppliers = state.suppliers.map(s => {
+      const updatedSuppliers = (state.suppliers || []).map(s => {
         if (s.id === purchase.supplierId) {
           return { ...s, balance: Math.max(0, (s.balance || 0) - purchaseDue) }
         }
@@ -372,37 +596,86 @@ function appReducer(state, action) {
       })
       return { 
         ...state, 
-        purchases: state.purchases.filter(p => p.id !== action.payload),
+        purchases: (state.purchases || []).filter(p => p.id !== action.payload),
         products: updatedProducts,
         suppliers: updatedSuppliers
       }
     }
+
+    // ============== PURCHASE RETURNS ==============
+    case 'ADD_PURCHASE_RETURN': {
+      const purchaseReturn = action.payload
+      // Reduce product stock
+      const updatedProducts = (state.products || []).map(p => {
+        const returnItem = (purchaseReturn.items || []).find(item => item.productId === p.id)
+        if (returnItem) {
+          return { ...p, currentStock: Math.max(0, (p.currentStock || 0) - returnItem.quantity) }
+        }
+        return p
+      })
+      return {
+        ...state,
+        purchaseReturns: [...(state.purchaseReturns || []), purchaseReturn],
+        products: updatedProducts
+      }
+    }
+
+    case 'UPDATE_PURCHASE_RETURN':
+      return {
+        ...state,
+        purchaseReturns: (state.purchaseReturns || []).map(r =>
+          r.id === action.payload.id ? { ...r, ...action.payload } : r
+        )
+      }
+
+    case 'DELETE_PURCHASE_RETURN':
+      return { ...state, purchaseReturns: (state.purchaseReturns || []).filter(r => r.id !== action.payload) }
 
     // ============== EXPENSES ==============
     case 'ADD_EXPENSE':
     case 'ADD_EXPENSE_FULL':
       return { 
         ...state, 
-        expenses: [...state.expenses, action.payload],
-        expenseCounter: state.expenseCounter + 1
+        expenses: [...(state.expenses || []), action.payload],
+        expenseCounter: (state.expenseCounter || 0) + 1
       }
     
     case 'UPDATE_EXPENSE':
       return { 
         ...state, 
-        expenses: state.expenses.map(e => 
+        expenses: (state.expenses || []).map(e => 
           e.id === action.payload.id ? action.payload : e
         )
       }
     
     case 'DELETE_EXPENSE':
-      return { ...state, expenses: state.expenses.filter(e => e.id !== action.payload) }
+      return { ...state, expenses: (state.expenses || []).filter(e => e.id !== action.payload) }
+
+    // ============== EXPENSE PAYMENTS ==============
+    case 'ADD_EXPENSE_PAYMENT': {
+      const payment = action.payload
+      const updatedExpenses = (state.expenses || []).map(e => {
+        if (e.id === payment.expenseId) {
+          const newAmountPaid = (e.amountPaid || 0) + payment.amount
+          return { 
+            ...e, 
+            amountPaid: newAmountPaid,
+            paymentStatus: newAmountPaid >= (e.totalAmount || 0) ? 'paid' : 'partial'
+          }
+        }
+        return e
+      })
+      return {
+        ...state,
+        expenses: updatedExpenses
+      }
+    }
 
     // ============== PAYMENTS ==============
     case 'ADD_SALES_PAYMENT': {
       const payment = action.payload
       // Update sale
-      const updatedSales = state.sales.map(s => {
+      const updatedSales = (state.sales || []).map(s => {
         if (s.id === payment.saleId) {
           const newAmountPaid = (s.amountPaid || 0) + payment.amount
           return { 
@@ -414,7 +687,7 @@ function appReducer(state, action) {
         return s
       })
       // Update customer balance
-      const updatedCustomers = state.customers.map(c => {
+      const updatedCustomers = (state.customers || []).map(c => {
         if (c.id === payment.customerId) {
           return { ...c, balance: Math.max(0, (c.balance || 0) - payment.amount) }
         }
@@ -422,7 +695,7 @@ function appReducer(state, action) {
       })
       return {
         ...state,
-        salesPayments: [...state.salesPayments, payment],
+        salesPayments: [...(state.salesPayments || []), payment],
         sales: updatedSales,
         customers: updatedCustomers
       }
@@ -431,7 +704,7 @@ function appReducer(state, action) {
     case 'ADD_PURCHASE_PAYMENT': {
       const payment = action.payload
       // Update purchase
-      const updatedPurchases = state.purchases.map(p => {
+      const updatedPurchases = (state.purchases || []).map(p => {
         if (p.id === payment.purchaseId) {
           const newAmountPaid = (p.amountPaid || 0) + payment.amount
           return { 
@@ -443,7 +716,7 @@ function appReducer(state, action) {
         return p
       })
       // Update supplier balance
-      const updatedSuppliers = state.suppliers.map(s => {
+      const updatedSuppliers = (state.suppliers || []).map(s => {
         if (s.id === payment.supplierId) {
           return { ...s, balance: Math.max(0, (s.balance || 0) - payment.amount) }
         }
@@ -451,7 +724,7 @@ function appReducer(state, action) {
       })
       return {
         ...state,
-        purchasePayments: [...state.purchasePayments, payment],
+        purchasePayments: [...(state.purchasePayments || []), payment],
         purchases: updatedPurchases,
         suppliers: updatedSuppliers
       }
@@ -461,9 +734,8 @@ function appReducer(state, action) {
     case 'ADD_STOCK_ADJUSTMENT':
     case 'ADD_STOCK_ADJUSTMENT_FULL': {
       const adjustment = action.payload
-      let updatedProducts = [...state.products]
+      let updatedProducts = [...(state.products || [])]
       
-      // Handle single item or multiple items
       const items = adjustment.items || [{ productId: adjustment.productId, quantity: adjustment.quantity }]
       items.forEach(item => {
         updatedProducts = updatedProducts.map(p =>
@@ -475,7 +747,7 @@ function appReducer(state, action) {
       
       return {
         ...state,
-        stockAdjustments: [...state.stockAdjustments, adjustment],
+        stockAdjustments: [...(state.stockAdjustments || []), adjustment],
         products: updatedProducts
       }
     }
@@ -514,13 +786,11 @@ export function AppProvider({ children }) {
       dispatch({ type: 'SET_LOADING', payload: true })
 
       try {
-        // Load all business data from Firestore
         const result = await loadAllBusinessData(businessId)
         
         if (result.success && result.data) {
           dispatch({ type: 'LOAD_ALL_DATA', payload: result.data })
         } else {
-          // New business - initialize with defaults
           console.log('Initializing new business...')
           await initializeNewBusiness(businessId, userData?.businessName, userData?.name)
           const newResult = await loadAllBusinessData(businessId)
@@ -566,11 +836,7 @@ export function AppProvider({ children }) {
         case 'ADD_PRODUCT': {
           const result = await addDocument(businessId, 'products', action.payload)
           if (result.success) {
-            // Update local state with Firestore ID
-            dispatch({ 
-              type: 'UPDATE_PRODUCT', 
-              payload: { ...action.payload, id: result.id }
-            })
+            dispatch({ type: 'UPDATE_PRODUCT', payload: { ...action.payload, id: result.id }})
           }
           break
         }
@@ -626,6 +892,95 @@ export function AppProvider({ children }) {
           await deleteDocument(businessId, 'units', action.payload)
           break
 
+        // ============== WARRANTIES ==============
+        case 'ADD_WARRANTY': {
+          const result = await addDocument(businessId, 'warranties', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_WARRANTY', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_WARRANTY':
+          await updateDocument(businessId, 'warranties', action.payload.id, action.payload)
+          break
+        case 'DELETE_WARRANTY':
+          await deleteDocument(businessId, 'warranties', action.payload)
+          break
+
+        // ============== EXPENSE CATEGORIES ==============
+        case 'ADD_EXPENSE_CATEGORY': {
+          const result = await addDocument(businessId, 'expenseCategories', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_EXPENSE_CATEGORY', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_EXPENSE_CATEGORY':
+          await updateDocument(businessId, 'expenseCategories', action.payload.id, action.payload)
+          break
+        case 'DELETE_EXPENSE_CATEGORY':
+          await deleteDocument(businessId, 'expenseCategories', action.payload)
+          break
+
+        // ============== ACCOUNT TYPES ==============
+        case 'ADD_ACCOUNT_TYPE': {
+          const result = await addDocument(businessId, 'accountTypes', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_ACCOUNT_TYPE', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_ACCOUNT_TYPE':
+          await updateDocument(businessId, 'accountTypes', action.payload.id, action.payload)
+          break
+        case 'DELETE_ACCOUNT_TYPE':
+          await deleteDocument(businessId, 'accountTypes', action.payload)
+          break
+
+        // ============== FUND TRANSFERS ==============
+        case 'ADD_FUND_TRANSFER': {
+          await addDocument(businessId, 'fundTransfers', action.payload)
+          break
+        }
+
+        // ============== DEPOSITS ==============
+        case 'ADD_DEPOSIT': {
+          await addDocument(businessId, 'deposits', action.payload)
+          break
+        }
+
+        // ============== REGISTER SESSIONS ==============
+        case 'OPEN_REGISTER_SESSION': {
+          const tempId = action.payload.id
+          const result = await addDocument(businessId, 'registerSessions', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_REGISTER_SESSION', payload: { _tempId: tempId, ...action.payload, id: result.id } })
+          }
+          break
+        }
+
+        case 'CLOSE_REGISTER_SESSION': {
+          if (action.payload.id) {
+            await updateDocument(businessId, 'registerSessions', action.payload.id, action.payload)
+          }
+          break
+        }
+
+        case 'ADD_CASH_MOVEMENT': {
+          const { sessionId, movement } = action.payload
+          // Find the session from current state and manually add the movement
+          // (state in this closure is stale - dispatch already ran but state hasn't updated yet)
+          const currentSession = (state.registerSessions || []).find(s => String(s.id) === String(sessionId))
+          if (currentSession && sessionId) {
+            const updatedSession = {
+              ...currentSession,
+              cashMovements: [...(currentSession.cashMovements || []), movement]
+            }
+            await updateDocument(businessId, 'registerSessions', sessionId, updatedSession)
+          }
+          break
+        }
+
         // ============== CUSTOMERS ==============
         case 'ADD_CUSTOMER': {
           const counter = await getNextCounter(businessId, 'customers')
@@ -643,7 +998,7 @@ export function AppProvider({ children }) {
         case 'UPDATE_CUSTOMER':
         case 'UPDATE_CUSTOMER_BALANCE':
           if (action.type === 'UPDATE_CUSTOMER_BALANCE') {
-            const customer = state.customers.find(c => c.id === action.payload.id)
+            const customer = (state.customers || []).find(c => c.id === action.payload.id)
             if (customer) {
               await updateDocument(businessId, 'customers', action.payload.id, {
                 balance: (customer.balance || 0) + action.payload.amount
@@ -674,7 +1029,7 @@ export function AppProvider({ children }) {
         case 'UPDATE_SUPPLIER':
         case 'UPDATE_SUPPLIER_BALANCE':
           if (action.type === 'UPDATE_SUPPLIER_BALANCE') {
-            const supplier = state.suppliers.find(s => s.id === action.payload.id)
+            const supplier = (state.suppliers || []).find(s => s.id === action.payload.id)
             if (supplier) {
               await updateDocument(businessId, 'suppliers', action.payload.id, {
                 balance: (supplier.balance || 0) + action.payload.amount
@@ -687,6 +1042,88 @@ export function AppProvider({ children }) {
         case 'DELETE_SUPPLIER':
           await deleteDocument(businessId, 'suppliers', action.payload)
           break
+
+        // ============== SALES AGENTS ==============
+        case 'ADD_SALES_AGENT': {
+          const tempId = action.payload.id
+          const result = await addDocument(businessId, 'salesAgents', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_SALES_AGENT', payload: { _tempId: tempId, ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_SALES_AGENT':
+          await updateDocument(businessId, 'salesAgents', action.payload.id, action.payload)
+          break
+        case 'DELETE_SALES_AGENT':
+          await deleteDocument(businessId, 'salesAgents', action.payload)
+          break
+
+        // ============== PAYMENT ACCOUNTS ==============
+        case 'ADD_PAYMENT_ACCOUNT': {
+          const tempId = action.payload.id
+          const result = await addDocument(businessId, 'paymentAccounts', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_PAYMENT_ACCOUNT', payload: { _tempId: tempId, ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_PAYMENT_ACCOUNT':
+          await updateDocument(businessId, 'paymentAccounts', action.payload.id, action.payload)
+          break
+        case 'DELETE_PAYMENT_ACCOUNT':
+          await deleteDocument(businessId, 'paymentAccounts', action.payload)
+          break
+        case 'UPDATE_ACCOUNT_BALANCE': {
+          const account = (state.paymentAccounts || []).find(a => a.id === action.payload.id)
+          if (account) {
+            await updateDocument(businessId, 'paymentAccounts', action.payload.id, {
+              balance: (account.balance || 0) + action.payload.amount
+            })
+          }
+          break
+        }
+
+        // ============== TAX RATES ==============
+        case 'ADD_TAX_RATE': {
+          const result = await addDocument(businessId, 'taxRates', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_TAX_RATE', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_TAX_RATE':
+          await updateDocument(businessId, 'taxRates', action.payload.id, action.payload)
+          break
+        case 'DELETE_TAX_RATE':
+          await deleteDocument(businessId, 'taxRates', action.payload)
+          break
+
+        // ============== ROLES ==============
+        case 'ADD_ROLE': {
+          const tempId = action.payload.id
+          const result = await addDocument(businessId, 'roles', action.payload)
+          if (result.success) {
+            dispatch({ type: 'UPDATE_ROLE', payload: { _tempId: tempId, ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_ROLE':
+          await updateDocument(businessId, 'roles', action.payload.id, action.payload)
+          break
+        case 'DELETE_ROLE':
+          await deleteDocument(businessId, 'roles', action.payload)
+          break
+
+        // ============== ACTIVITY LOGS ==============
+        case 'ADD_ACTIVITY_LOG': {
+          const logData = {
+            ...action.payload,
+            timestamp: new Date().toISOString()
+          }
+          await addDocument(businessId, 'activityLogs', logData)
+          break
+        }
 
         // ============== SALES ==============
         case 'ADD_SALE': {
@@ -702,7 +1139,7 @@ export function AppProvider({ children }) {
           
           // Update products stock in Firestore
           for (const item of action.payload.items || []) {
-            const product = state.products.find(p => p.id === item.productId)
+            const product = (state.products || []).find(p => p.id === item.productId)
             if (product) {
               await updateDocument(businessId, 'products', item.productId, {
                 currentStock: (product.currentStock || 0) - item.quantity
@@ -712,7 +1149,7 @@ export function AppProvider({ children }) {
           
           // Update customer balance in Firestore
           if (action.payload.customerId) {
-            const customer = state.customers.find(c => c.id === action.payload.customerId)
+            const customer = (state.customers || []).find(c => c.id === action.payload.customerId)
             if (customer) {
               const balanceToAdd = (action.payload.total || 0) - (action.payload.amountPaid || 0)
               await updateDocument(businessId, 'customers', action.payload.customerId, {
@@ -730,11 +1167,11 @@ export function AppProvider({ children }) {
           await updateDocument(businessId, 'sales', action.payload.id, action.payload)
           break
         case 'DELETE_SALE': {
-          const sale = state.sales.find(s => s.id === action.payload)
+          const sale = (state.sales || []).find(s => s.id === action.payload)
           if (sale) {
             // Restore stock
             for (const item of sale.items || []) {
-              const product = state.products.find(p => p.id === item.productId)
+              const product = (state.products || []).find(p => p.id === item.productId)
               if (product) {
                 await updateDocument(businessId, 'products', item.productId, {
                   currentStock: (product.currentStock || 0) + item.quantity
@@ -743,7 +1180,7 @@ export function AppProvider({ children }) {
             }
             // Update customer balance
             if (sale.customerId) {
-              const customer = state.customers.find(c => c.id === sale.customerId)
+              const customer = (state.customers || []).find(c => c.id === sale.customerId)
               if (customer) {
                 const saleDue = (sale.total || 0) - (sale.amountPaid || 0)
                 await updateDocument(businessId, 'customers', sale.customerId, {
@@ -755,6 +1192,30 @@ export function AppProvider({ children }) {
           }
           break
         }
+
+        // ============== SALE RETURNS ==============
+        case 'ADD_SALE_RETURN': {
+          const result = await addDocument(businessId, 'saleReturns', action.payload)
+          // Restore stock in Firestore
+          for (const item of action.payload.items || []) {
+            const product = (state.products || []).find(p => p.id === item.productId)
+            if (product) {
+              await updateDocument(businessId, 'products', item.productId, {
+                currentStock: (product.currentStock || 0) + item.quantity
+              })
+            }
+          }
+          if (result.success) {
+            dispatch({ type: 'UPDATE_SALE_RETURN', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_SALE_RETURN':
+          await updateDocument(businessId, 'saleReturns', action.payload.id, action.payload)
+          break
+        case 'DELETE_SALE_RETURN':
+          await deleteDocument(businessId, 'saleReturns', action.payload)
+          break
 
         // ============== PURCHASES ==============
         case 'ADD_PURCHASE': {
@@ -770,7 +1231,7 @@ export function AppProvider({ children }) {
           
           // Update products stock in Firestore
           for (const item of action.payload.items || []) {
-            const product = state.products.find(p => p.id === item.productId)
+            const product = (state.products || []).find(p => p.id === item.productId)
             if (product) {
               await updateDocument(businessId, 'products', item.productId, {
                 currentStock: (product.currentStock || 0) + item.quantity
@@ -780,7 +1241,7 @@ export function AppProvider({ children }) {
           
           // Update supplier balance in Firestore
           if (action.payload.supplierId) {
-            const supplier = state.suppliers.find(s => s.id === action.payload.supplierId)
+            const supplier = (state.suppliers || []).find(s => s.id === action.payload.supplierId)
             if (supplier) {
               const balanceToAdd = (action.payload.total || 0) - (action.payload.amountPaid || 0)
               await updateDocument(businessId, 'suppliers', action.payload.supplierId, {
@@ -798,11 +1259,11 @@ export function AppProvider({ children }) {
           await updateDocument(businessId, 'purchases', action.payload.id, action.payload)
           break
         case 'DELETE_PURCHASE': {
-          const purchase = state.purchases.find(p => p.id === action.payload)
+          const purchase = (state.purchases || []).find(p => p.id === action.payload)
           if (purchase) {
             // Reduce stock
             for (const item of purchase.items || []) {
-              const product = state.products.find(p => p.id === item.productId)
+              const product = (state.products || []).find(p => p.id === item.productId)
               if (product) {
                 await updateDocument(businessId, 'products', item.productId, {
                   currentStock: Math.max(0, (product.currentStock || 0) - item.quantity)
@@ -811,7 +1272,7 @@ export function AppProvider({ children }) {
             }
             // Update supplier balance
             if (purchase.supplierId) {
-              const supplier = state.suppliers.find(s => s.id === purchase.supplierId)
+              const supplier = (state.suppliers || []).find(s => s.id === purchase.supplierId)
               if (supplier) {
                 const purchaseDue = (purchase.total || 0) - (purchase.amountPaid || 0)
                 await updateDocument(businessId, 'suppliers', purchase.supplierId, {
@@ -823,6 +1284,30 @@ export function AppProvider({ children }) {
           }
           break
         }
+
+        // ============== PURCHASE RETURNS ==============
+        case 'ADD_PURCHASE_RETURN': {
+          const result = await addDocument(businessId, 'purchaseReturns', action.payload)
+          // Reduce stock in Firestore
+          for (const item of action.payload.items || []) {
+            const product = (state.products || []).find(p => p.id === item.productId)
+            if (product) {
+              await updateDocument(businessId, 'products', item.productId, {
+                currentStock: Math.max(0, (product.currentStock || 0) - item.quantity)
+              })
+            }
+          }
+          if (result.success) {
+            dispatch({ type: 'UPDATE_PURCHASE_RETURN', payload: { ...action.payload, id: result.id }})
+          }
+          break
+        }
+        case 'UPDATE_PURCHASE_RETURN':
+          await updateDocument(businessId, 'purchaseReturns', action.payload.id, action.payload)
+          break
+        case 'DELETE_PURCHASE_RETURN':
+          await deleteDocument(businessId, 'purchaseReturns', action.payload)
+          break
 
         // ============== EXPENSES ==============
         case 'ADD_EXPENSE':
@@ -846,11 +1331,24 @@ export function AppProvider({ children }) {
           await deleteDocument(businessId, 'expenses', action.payload)
           break
 
+        // ============== EXPENSE PAYMENTS ==============
+        case 'ADD_EXPENSE_PAYMENT': {
+          const expense = (state.expenses || []).find(e => e.id === action.payload.expenseId)
+          if (expense) {
+            const newAmountPaid = (expense.amountPaid || 0) + action.payload.amount
+            await updateDocument(businessId, 'expenses', action.payload.expenseId, {
+              amountPaid: newAmountPaid,
+              paymentStatus: newAmountPaid >= (expense.totalAmount || 0) ? 'paid' : 'partial'
+            })
+          }
+          break
+        }
+
         // ============== PAYMENTS ==============
         case 'ADD_SALES_PAYMENT': {
           await addDocument(businessId, 'salesPayments', action.payload)
           // Update sale
-          const sale = state.sales.find(s => s.id === action.payload.saleId)
+          const sale = (state.sales || []).find(s => s.id === action.payload.saleId)
           if (sale) {
             const newAmountPaid = (sale.amountPaid || 0) + action.payload.amount
             await updateDocument(businessId, 'sales', action.payload.saleId, {
@@ -859,7 +1357,7 @@ export function AppProvider({ children }) {
             })
           }
           // Update customer
-          const customer = state.customers.find(c => c.id === action.payload.customerId)
+          const customer = (state.customers || []).find(c => c.id === action.payload.customerId)
           if (customer) {
             await updateDocument(businessId, 'customers', action.payload.customerId, {
               balance: Math.max(0, (customer.balance || 0) - action.payload.amount)
@@ -871,7 +1369,7 @@ export function AppProvider({ children }) {
         case 'ADD_PURCHASE_PAYMENT': {
           await addDocument(businessId, 'purchasePayments', action.payload)
           // Update purchase
-          const purchase = state.purchases.find(p => p.id === action.payload.purchaseId)
+          const purchase = (state.purchases || []).find(p => p.id === action.payload.purchaseId)
           if (purchase) {
             const newAmountPaid = (purchase.amountPaid || 0) + action.payload.amount
             await updateDocument(businessId, 'purchases', action.payload.purchaseId, {
@@ -880,7 +1378,7 @@ export function AppProvider({ children }) {
             })
           }
           // Update supplier
-          const supplier = state.suppliers.find(s => s.id === action.payload.supplierId)
+          const supplier = (state.suppliers || []).find(s => s.id === action.payload.supplierId)
           if (supplier) {
             await updateDocument(businessId, 'suppliers', action.payload.supplierId, {
               balance: Math.max(0, (supplier.balance || 0) - action.payload.amount)
@@ -896,7 +1394,7 @@ export function AppProvider({ children }) {
           // Update product stock
           const items = action.payload.items || [{ productId: action.payload.productId, quantity: action.payload.quantity }]
           for (const item of items) {
-            const product = state.products.find(p => p.id === item.productId)
+            const product = (state.products || []).find(p => p.id === item.productId)
             if (product) {
               await updateDocument(businessId, 'products', item.productId, {
                 currentStock: (product.currentStock || 0) + item.quantity
@@ -912,7 +1410,8 @@ export function AppProvider({ children }) {
         case 'SET_LOADING':
         case 'LOAD_ALL_DATA':
         case 'RESET_STATE':
-          // These don't need Firestore sync
+        case 'SET_PRODUCTS':
+        case 'UPDATE_STOCK':
           break
 
         default:
@@ -920,7 +1419,6 @@ export function AppProvider({ children }) {
       }
     } catch (error) {
       console.error(`Error syncing ${action.type} to Firestore:`, error)
-      // Optionally show error to user
     }
   }, [businessId, state])
 
@@ -929,7 +1427,7 @@ export function AppProvider({ children }) {
   // ============================================
   const value = {
     state,
-    dispatch: syncedDispatch, // Use synced dispatch instead of raw dispatch
+    dispatch: syncedDispatch,
     isLoading: state.isLoading || authLoading,
     isInitialized: initialized && state.dataLoaded
   }

@@ -23,7 +23,6 @@ export default function Sales() {
 
   const printRef = useRef()
 
-  // Helper functions
   const getCustomer = (id) => customers.find(c => c.id === id) || { name: 'Unknown' }
   const getProduct = (id) => products.find(p => p.id === id) || { name: 'Unknown' }
   
@@ -39,7 +38,6 @@ export default function Sales() {
       .reduce((sum, sr) => sum + (sr.total || 0), 0)
   }
 
-  // Filtering
   const filteredSales = (sales || []).filter(sale => {
     const customer = getCustomer(sale.customerId)
     const matchesSearch = sale.invoiceNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,7 +47,6 @@ export default function Sales() {
     return matchesSearch && matchesStatus && matchesCustomer
   })
 
-  // Summary calculations
   const totalSales = filteredSales.length
   const totalAmount = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0)
   const totalPaid = filteredSales.reduce((sum, s) => sum + getActualPaidForSale(s.id), 0)
@@ -190,6 +187,9 @@ export default function Sales() {
       {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center">
         <select
+          id="saleFilterStatus"
+          name="saleFilterStatus"
+          aria-label="Filter by payment status"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
           className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm"
@@ -200,6 +200,9 @@ export default function Sales() {
           <option value="due">Due</option>
         </select>
         <select
+          id="saleFilterCustomer"
+          name="saleFilterCustomer"
+          aria-label="Filter by customer"
           value={customerFilter}
           onChange={(e) => setCustomerFilter(e.target.value)}
           className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm"
@@ -211,6 +214,10 @@ export default function Sales() {
         </select>
         <div className="flex-1"></div>
         <input
+          id="saleSearch"
+          name="saleSearch"
+          autoComplete="off"
+          aria-label="Search sales"
           type="text"
           placeholder="Search..."
           value={searchTerm}
@@ -338,8 +345,8 @@ export default function Sales() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method *</label>
-                  <select value={paymentData.method} onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                  <label htmlFor="salePayMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method *</label>
+                  <select id="salePayMethod" name="salePayMethod" value={paymentData.method} onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                     <option value="Cash">Cash</option>
                     <option value="Card">Card</option>
                     <option value="Bank Transfer">Bank Transfer</option>
@@ -347,22 +354,22 @@ export default function Sales() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Amount *</label>
-                  <input type="number" step="0.01" value={paymentData.amount} onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
+                  <label htmlFor="salePayAmount" className="block text-sm font-medium text-slate-300 mb-2">Amount *</label>
+                  <input id="salePayAmount" name="salePayAmount" autoComplete="off" type="number" step="0.01" value={paymentData.amount} onChange={(e) => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account</label>
-                <select value={paymentData.accountId} onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                <label htmlFor="salePayAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account</label>
+                <select id="salePayAccountId" name="salePayAccountId" value={paymentData.accountId} onChange={(e) => setPaymentData({ ...paymentData, accountId: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                   <option value="">None</option>
                   {accounts.map(acc => (<option key={acc.id} value={acc.id}>{acc.name}</option>))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Note</label>
-                <textarea value={paymentData.note} onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" />
+                <label htmlFor="salePayNote" className="block text-sm font-medium text-slate-300 mb-2">Note</label>
+                <textarea id="salePayNote" name="salePayNote" value={paymentData.note} onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" />
               </div>
               
               <div className="flex justify-end gap-3 pt-4">
@@ -386,7 +393,6 @@ export default function Sales() {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Header Info */}
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-slate-900/50 p-4 rounded-lg">
                   <h3 className="text-white font-medium mb-3">Invoice Info</h3>
@@ -406,7 +412,6 @@ export default function Sales() {
                 </div>
               </div>
 
-              {/* Items */}
               <div>
                 <h3 className="text-white font-medium mb-3">Items</h3>
                 <table className="w-full">
@@ -433,7 +438,6 @@ export default function Sales() {
                 </table>
               </div>
 
-              {/* Totals */}
               <div className="flex justify-end">
                 <div className="w-64 space-y-2 text-sm">
                   <div className="flex justify-between"><span className="text-slate-400">Subtotal:</span><span className="text-white">{business.currency} {(selectedSale.subtotal || selectedSale.total || 0).toFixed(2)}</span></div>
@@ -448,7 +452,6 @@ export default function Sales() {
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex justify-end gap-3">
                 <button onClick={() => { setShowViewModal(false); printInvoice(selectedSale); }} className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
@@ -465,14 +468,12 @@ export default function Sales() {
       {showInvoice && selectedSale && (
         <div className="fixed inset-0 bg-white z-[9999] print:block hidden">
           <div ref={printRef} className="p-8 max-w-2xl mx-auto">
-            {/* Business Header */}
             <div className="text-center mb-6">
               <h1 className="text-2xl font-bold">{business.name}</h1>
               {business.address && <p className="text-gray-600">{business.address}</p>}
               {business.phone && <p className="text-gray-600">Mobile: {business.phone}</p>}
             </div>
 
-            {/* Invoice Info */}
             <div className="flex justify-between mb-6">
               <div>
                 <p><strong>Invoice No:</strong> {selectedSale.invoiceNo}</p>
@@ -484,7 +485,6 @@ export default function Sales() {
               </div>
             </div>
 
-            {/* Items Table */}
             <table className="w-full mb-6 border-collapse">
               <thead>
                 <tr className="border-b-2 border-gray-300">
@@ -508,7 +508,6 @@ export default function Sales() {
               </tbody>
             </table>
 
-            {/* Totals */}
             <div className="flex justify-end">
               <div className="w-64">
                 <div className="flex justify-between py-1"><span>Subtotal:</span><span>{business.currency} {(selectedSale.subtotal || selectedSale.total || 0).toFixed(2)}</span></div>

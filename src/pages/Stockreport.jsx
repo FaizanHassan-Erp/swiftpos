@@ -542,6 +542,10 @@ export default function Stockreport() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative flex-1 min-w-[200px] max-w-md">
               <input
+                id="srSearch"
+                name="srSearch"
+                autoComplete="off"
+                aria-label="Search by product name or SKU"
                 type="text"
                 placeholder="Search by product name or SKU..."
                 value={searchTerm}
@@ -554,6 +558,9 @@ export default function Stockreport() {
             </div>
 
             <select
+              id="srCategory"
+              name="srCategory"
+              aria-label="Filter by category"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -565,6 +572,9 @@ export default function Stockreport() {
             </select>
 
             <select
+              id="srBrand"
+              name="srBrand"
+              aria-label="Filter by brand"
               value={filterBrand}
               onChange={(e) => setFilterBrand(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -576,6 +586,9 @@ export default function Stockreport() {
             </select>
 
             <select
+              id="srStatus"
+              name="srStatus"
+              aria-label="Filter by stock status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -587,6 +600,9 @@ export default function Stockreport() {
             </select>
 
             <select
+              id="srSortBy"
+              name="srSortBy"
+              aria-label="Sort products"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"

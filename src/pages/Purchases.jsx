@@ -11,7 +11,7 @@ export default function Purchases() {
   const [showViewModal, setShowViewModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showProductModal, setShowProductModal] = useState(false)
-  const [showSupplierModal, setShowSupplierModal] = useState(false) // NEW: Supplier modal state
+  const [showSupplierModal, setShowSupplierModal] = useState(false)
   const [selectedPurchase, setSelectedPurchase] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -35,7 +35,6 @@ export default function Purchases() {
   const [productSearch, setProductSearch] = useState('')
   const [showProductDropdown, setShowProductDropdown] = useState(false)
 
-  // New Product Form Data
   const [newProductData, setNewProductData] = useState({
     name: '',
     sku: '',
@@ -50,7 +49,6 @@ export default function Purchases() {
     description: ''
   })
 
-  // NEW: Supplier Form Data
   const [newSupplierData, setNewSupplierData] = useState({
     contactType: 'supplier',
     businessType: 'business',
@@ -64,10 +62,8 @@ export default function Purchases() {
     address: ''
   })
 
-  // Filter active payment accounts
   const activeAccounts = paymentAccounts.filter(acc => acc.status !== 'closed')
 
-  // Filter purchases
   const filteredPurchases = purchases.filter(p => {
     const supplier = suppliers.find(s => s.id === p.supplierId)
     const matchSearch = 
@@ -82,7 +78,6 @@ export default function Purchases() {
     return matchSearch && matchStatus && matchSupplier
   })
 
-  // Filter products for search
   const searchedProducts = productSearch.trim()
     ? products.filter(p =>
         p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
@@ -90,25 +85,21 @@ export default function Purchases() {
       )
     : []
 
-  // Calculate totals
   const subtotal = formData.items.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0)
   const discountAmount = formData.discount || 0
   const taxAmount = ((subtotal - discountAmount) * (formData.taxRate || 0)) / 100
   const total = subtotal - discountAmount + taxAmount + (parseFloat(formData.shipping) || 0)
 
-  // Generate SKU
   function generateSKU() {
     const prefix = 'PRD'
     const number = String(products.length + 1).padStart(4, '0')
     return `${prefix}-${number}`
   }
 
-  // Get account name helper
   function getAccountName(id) {
     return paymentAccounts?.find(a => a.id === id)?.name || '-'
   }
 
-  // Get expiry status helper
   function getExpiryStatus(expiryDate) {
     if (!expiryDate) return { status: 'none', label: 'No Expiry', color: 'slate' }
     
@@ -132,7 +123,6 @@ export default function Purchases() {
     return { status: 'ok', label: `${daysUntilExpiry}d left`, color: 'emerald', days: daysUntilExpiry }
   }
 
-  // Expiry badge component
   function ExpiryBadge({ expiryDate }) {
     const status = getExpiryStatus(expiryDate)
     
@@ -189,7 +179,6 @@ export default function Purchases() {
     })
   }
 
-  // NEW: Reset Supplier Form
   function resetSupplierForm() {
     setNewSupplierData({
       contactType: 'supplier',
@@ -216,7 +205,6 @@ export default function Purchases() {
     setShowProductDropdown(false)
   }
 
-  // NEW: Open Supplier Modal
   function openSupplierModal() {
     resetSupplierForm()
     setShowSupplierModal(true)
@@ -242,7 +230,7 @@ export default function Purchases() {
           sku: product.sku || '',
           quantity: 1,
           unitCost: product.costPrice || 0,
-          expiryDate: product.expiryDate || '' // Default to product's expiry date
+          expiryDate: product.expiryDate || ''
         }]
       })
     }
@@ -275,7 +263,6 @@ export default function Purchases() {
     })
   }
 
-  // Update item expiry date
   function updateItemExpiry(productId, expiryDate) {
     setFormData({
       ...formData,
@@ -292,7 +279,6 @@ export default function Purchases() {
     })
   }
 
-  // Handle New Product Submit
   function handleProductSubmit(e) {
     e.preventDefault()
     
@@ -332,7 +318,6 @@ export default function Purchases() {
     resetProductForm()
   }
 
-  // NEW: Handle Supplier Submit
   function handleSupplierSubmit(e) {
     e.preventDefault()
     
@@ -355,7 +340,6 @@ export default function Purchases() {
 
     dispatch({ type: 'ADD_SUPPLIER', payload: newSupplier })
 
-    // Auto-select the new supplier in the form
     setFormData({
       ...formData,
       supplierId: newSupplier.id.toString()
@@ -410,13 +394,11 @@ export default function Purchases() {
     setShowViewModal(true)
   }
 
-  // Get supplier name helper
   function getSupplierName(supplierId) {
     const supplier = suppliers.find(s => s.id === supplierId)
     return supplier?.businessName || supplier?.name || '-'
   }
 
-  // Status badge
   function getStatusBadge(status) {
     const styles = {
       paid: 'bg-emerald-500/20 text-emerald-400',
@@ -432,7 +414,6 @@ export default function Purchases() {
     )
   }
 
-  // Calculate totals for summary
   const totalPurchases = filteredPurchases.reduce((sum, p) => sum + (p.total || 0), 0)
   const totalPaid = filteredPurchases.reduce((sum, p) => sum + (p.amountPaid || 0), 0)
   const totalDue = totalPurchases - totalPaid
@@ -518,6 +499,9 @@ export default function Purchases() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <select
+              id="purFilterStatus"
+              name="purFilterStatus"
+              aria-label="Filter by payment status"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -528,6 +512,9 @@ export default function Purchases() {
               <option value="due">Due</option>
             </select>
             <select
+              id="purFilterSupplier"
+              name="purFilterSupplier"
+              aria-label="Filter by supplier"
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
               className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
@@ -540,6 +527,10 @@ export default function Purchases() {
           </div>
           <div className="relative w-full md:w-auto">
             <input
+              id="purSearch"
+              name="purSearch"
+              autoComplete="off"
+              aria-label="Search purchases"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -673,11 +664,12 @@ export default function Purchases() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {/* UPDATED: Supplier Field with + Button */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Supplier *</label>
+                    <label htmlFor="purSupplierId" className="block text-sm font-medium text-slate-300 mb-2">Supplier *</label>
                     <div className="flex gap-2">
                       <select
+                        id="purSupplierId"
+                        name="purSupplierId"
                         value={formData.supplierId}
                         onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
                         className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -701,8 +693,11 @@ export default function Purchases() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Reference No</label>
+                    <label htmlFor="purReferenceNo" className="block text-sm font-medium text-slate-300 mb-2">Reference No</label>
                     <input
+                      id="purReferenceNo"
+                      name="purReferenceNo"
+                      autoComplete="off"
                       type="text"
                       value={formData.referenceNo}
                       onChange={(e) => setFormData({ ...formData, referenceNo: e.target.value })}
@@ -711,8 +706,10 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
+                    <label htmlFor="purDate" className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
                     <input
+                      id="purDate"
+                      name="purDate"
                       type="datetime-local"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -721,8 +718,10 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                    <label htmlFor="purStatus" className="block text-sm font-medium text-slate-300 mb-2">Status</label>
                     <select
+                      id="purStatus"
+                      name="purStatus"
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -736,9 +735,12 @@ export default function Purchases() {
 
                 {/* Product Search */}
                 <div className="bg-slate-900/50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Add Products</label>
+                  <label htmlFor="purProductSearch" className="block text-sm font-medium text-slate-300 mb-2">Add Products</label>
                   <div className="relative">
                     <input
+                      id="purProductSearch"
+                      name="purProductSearch"
+                      autoComplete="off"
                       type="text"
                       value={productSearch}
                       onChange={(e) => {
@@ -755,7 +757,6 @@ export default function Purchases() {
                     
                     {showProductDropdown && (
                       <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto">
-                        {/* Add New Product Button */}
                         <button
                           type="button"
                           onClick={openProductModal}
@@ -772,7 +773,6 @@ export default function Purchases() {
                           </div>
                         </button>
 
-                        {/* Search Results */}
                         {searchedProducts.length > 0 ? (
                           searchedProducts.slice(0, 10).map(product => (
                             <button
@@ -859,6 +859,7 @@ export default function Purchases() {
                             </td>
                             <td className="px-4 py-3">
                               <input
+                                aria-label={`Quantity for ${item.name}`}
                                 type="number"
                                 min="1"
                                 value={item.quantity}
@@ -868,6 +869,7 @@ export default function Purchases() {
                             </td>
                             <td className="px-4 py-3">
                               <input
+                                aria-label={`Unit cost for ${item.name}`}
                                 type="number"
                                 min="0"
                                 step="0.01"
@@ -878,6 +880,7 @@ export default function Purchases() {
                             </td>
                             <td className="px-4 py-3">
                               <input
+                                aria-label={`Expiry date for ${item.name}`}
                                 type="date"
                                 value={item.expiryDate || ''}
                                 onChange={(e) => updateItemExpiry(item.productId, e.target.value)}
@@ -912,13 +915,15 @@ export default function Purchases() {
 
                 {/* Additional Details & Payment Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Additional Details */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-white">Additional Details</h3>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Discount</label>
+                        <label htmlFor="purDiscount" className="block text-sm font-medium text-slate-300 mb-2">Discount</label>
                         <input
+                          id="purDiscount"
+                          name="purDiscount"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.discount}
@@ -927,8 +932,11 @@ export default function Purchases() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Tax %</label>
+                        <label htmlFor="purTaxRate" className="block text-sm font-medium text-slate-300 mb-2">Tax %</label>
                         <input
+                          id="purTaxRate"
+                          name="purTaxRate"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.taxRate}
@@ -937,8 +945,11 @@ export default function Purchases() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Shipping</label>
+                        <label htmlFor="purShipping" className="block text-sm font-medium text-slate-300 mb-2">Shipping</label>
                         <input
+                          id="purShipping"
+                          name="purShipping"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.shipping}
@@ -948,8 +959,10 @@ export default function Purchases() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Note</label>
+                      <label htmlFor="purNote" className="block text-sm font-medium text-slate-300 mb-2">Note</label>
                       <textarea
+                        id="purNote"
+                        name="purNote"
                         value={formData.note}
                         onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                         className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -986,8 +999,11 @@ export default function Purchases() {
                       </div>
                       <hr className="border-slate-700" />
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
+                        <label htmlFor="purAmountPaid" className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
                         <input
+                          id="purAmountPaid"
+                          name="purAmountPaid"
+                          autoComplete="off"
                           type="number"
                           min="0"
                           value={formData.amountPaid}
@@ -996,8 +1012,10 @@ export default function Purchases() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
+                        <label htmlFor="purPaymentMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
                         <select
+                          id="purPaymentMethod"
+                          name="purPaymentMethod"
                           value={formData.paymentMethod}
                           onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                           className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1009,8 +1027,10 @@ export default function Purchases() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
+                        <label htmlFor="purPaymentAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
                         <select
+                          id="purPaymentAccountId"
+                          name="purPaymentAccountId"
                           value={formData.paymentAccountId}
                           onChange={(e) => setFormData({ ...formData, paymentAccountId: e.target.value })}
                           className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1055,7 +1075,7 @@ export default function Purchases() {
         </div>
       )}
 
-      {/* NEW: Quick Add Supplier Modal */}
+      {/* Quick Add Supplier Modal */}
       {showSupplierModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
@@ -1077,8 +1097,9 @@ export default function Purchases() {
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 text-slate-300">
                     <input 
+                      id="qaSuppTypeIndividual"
                       type="radio" 
-                      name="supplierBusinessType" 
+                      name="qaSuppBusinessType" 
                       value="individual" 
                       checked={newSupplierData.businessType === 'individual'} 
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, businessType: e.target.value })} 
@@ -1088,8 +1109,9 @@ export default function Purchases() {
                   </label>
                   <label className="flex items-center gap-2 text-slate-300">
                     <input 
+                      id="qaSuppTypeBusiness"
                       type="radio" 
-                      name="supplierBusinessType" 
+                      name="qaSuppBusinessType" 
                       value="business" 
                       checked={newSupplierData.businessType === 'business'} 
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, businessType: e.target.value })} 
@@ -1099,11 +1121,13 @@ export default function Purchases() {
                   </label>
                 </div>
 
-                {/* Business Name (if business type) */}
                 {newSupplierData.businessType === 'business' && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Business Name</label>
+                    <label htmlFor="qaSuppBusinessName" className="block text-sm font-medium text-slate-300 mb-1">Business Name</label>
                     <input
+                      id="qaSuppBusinessName"
+                      name="qaSuppBusinessName"
+                      autoComplete="off"
                       type="text"
                       value={newSupplierData.businessName}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, businessName: e.target.value })}
@@ -1113,11 +1137,13 @@ export default function Purchases() {
                   </div>
                 )}
 
-                {/* Name & Phone */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Contact Name *</label>
+                    <label htmlFor="qaSuppName" className="block text-sm font-medium text-slate-300 mb-1">Contact Name *</label>
                     <input
+                      id="qaSuppName"
+                      name="qaSuppName"
+                      autoComplete="off"
                       type="text"
                       value={newSupplierData.name}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, name: e.target.value })}
@@ -1127,8 +1153,11 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Mobile *</label>
+                    <label htmlFor="qaSuppPhone" className="block text-sm font-medium text-slate-300 mb-1">Mobile *</label>
                     <input
+                      id="qaSuppPhone"
+                      name="qaSuppPhone"
+                      autoComplete="off"
                       type="text"
                       value={newSupplierData.phone}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, phone: e.target.value })}
@@ -1139,11 +1168,13 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Email & Tax Number */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
+                    <label htmlFor="qaSuppEmail" className="block text-sm font-medium text-slate-300 mb-1">Email</label>
                     <input
+                      id="qaSuppEmail"
+                      name="qaSuppEmail"
+                      autoComplete="off"
                       type="email"
                       value={newSupplierData.email}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, email: e.target.value })}
@@ -1152,8 +1183,11 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Tax Number</label>
+                    <label htmlFor="qaSuppTaxNumber" className="block text-sm font-medium text-slate-300 mb-1">Tax Number</label>
                     <input
+                      id="qaSuppTaxNumber"
+                      name="qaSuppTaxNumber"
+                      autoComplete="off"
                       type="text"
                       value={newSupplierData.taxNumber}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, taxNumber: e.target.value })}
@@ -1163,11 +1197,12 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Pay Term & Opening Balance */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Pay Term</label>
+                    <label htmlFor="qaSuppPayTerm" className="block text-sm font-medium text-slate-300 mb-1">Pay Term</label>
                     <select
+                      id="qaSuppPayTerm"
+                      name="qaSuppPayTerm"
                       value={newSupplierData.payTerm}
                       onChange={(e) => setNewSupplierData({ ...newSupplierData, payTerm: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1181,8 +1216,11 @@ export default function Purchases() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Opening Balance</label>
+                    <label htmlFor="qaSuppOpeningBalance" className="block text-sm font-medium text-slate-300 mb-1">Opening Balance</label>
                     <input
+                      id="qaSuppOpeningBalance"
+                      name="qaSuppOpeningBalance"
+                      autoComplete="off"
                       type="number"
                       step="0.01"
                       value={newSupplierData.openingBalance}
@@ -1193,10 +1231,11 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Address */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Address</label>
+                  <label htmlFor="qaSuppAddress" className="block text-sm font-medium text-slate-300 mb-1">Address</label>
                   <textarea
+                    id="qaSuppAddress"
+                    name="qaSuppAddress"
                     value={newSupplierData.address}
                     onChange={(e) => setNewSupplierData({ ...newSupplierData, address: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1205,7 +1244,6 @@ export default function Purchases() {
                   />
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
                   <button
                     type="button"
@@ -1245,11 +1283,13 @@ export default function Purchases() {
             
             <div className="flex-1 overflow-y-auto p-6">
               <form onSubmit={handleProductSubmit} className="space-y-4">
-                {/* Product Name & SKU */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Product Name *</label>
+                    <label htmlFor="qaProdName" className="block text-sm font-medium text-slate-300 mb-2">Product Name *</label>
                     <input
+                      id="qaProdName"
+                      name="qaProdName"
+                      autoComplete="off"
                       type="text"
                       value={newProductData.name}
                       onChange={(e) => setNewProductData({ ...newProductData, name: e.target.value })}
@@ -1259,8 +1299,11 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">SKU</label>
+                    <label htmlFor="qaProdSku" className="block text-sm font-medium text-slate-300 mb-2">SKU</label>
                     <input
+                      id="qaProdSku"
+                      name="qaProdSku"
+                      autoComplete="off"
                       type="text"
                       value={newProductData.sku}
                       onChange={(e) => setNewProductData({ ...newProductData, sku: e.target.value })}
@@ -1270,11 +1313,12 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Category, Brand, Unit */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
+                    <label htmlFor="qaProdCategoryId" className="block text-sm font-medium text-slate-300 mb-2">Category</label>
                     <select
+                      id="qaProdCategoryId"
+                      name="qaProdCategoryId"
                       value={newProductData.categoryId}
                       onChange={(e) => setNewProductData({ ...newProductData, categoryId: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1286,8 +1330,10 @@ export default function Purchases() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Brand</label>
+                    <label htmlFor="qaProdBrandId" className="block text-sm font-medium text-slate-300 mb-2">Brand</label>
                     <select
+                      id="qaProdBrandId"
+                      name="qaProdBrandId"
                       value={newProductData.brandId}
                       onChange={(e) => setNewProductData({ ...newProductData, brandId: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1299,8 +1345,10 @@ export default function Purchases() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Unit</label>
+                    <label htmlFor="qaProdUnitId" className="block text-sm font-medium text-slate-300 mb-2">Unit</label>
                     <select
+                      id="qaProdUnitId"
+                      name="qaProdUnitId"
                       value={newProductData.unitId}
                       onChange={(e) => setNewProductData({ ...newProductData, unitId: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1313,13 +1361,15 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Prices */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Cost Price *</label>
+                    <label htmlFor="qaProdCostPrice" className="block text-sm font-medium text-slate-300 mb-2">Cost Price *</label>
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-slate-400">{business.currency}</span>
                       <input
+                        id="qaProdCostPrice"
+                        name="qaProdCostPrice"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         step="0.01"
@@ -1332,10 +1382,13 @@ export default function Purchases() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Selling Price *</label>
+                    <label htmlFor="qaProdSellingPrice" className="block text-sm font-medium text-slate-300 mb-2">Selling Price *</label>
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-slate-400">{business.currency}</span>
                       <input
+                        id="qaProdSellingPrice"
+                        name="qaProdSellingPrice"
+                        autoComplete="off"
                         type="number"
                         min="0"
                         step="0.01"
@@ -1349,7 +1402,6 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Margin Display */}
                 {newProductData.costPrice && newProductData.sellingPrice && (
                   <div className="bg-slate-900/50 rounded-lg p-3 flex items-center justify-between">
                     <span className="text-slate-400">Profit Margin:</span>
@@ -1362,11 +1414,13 @@ export default function Purchases() {
                   </div>
                 )}
 
-                {/* Stock, Alert & Expiry */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Opening Stock</label>
+                    <label htmlFor="qaProdCurrentStock" className="block text-sm font-medium text-slate-300 mb-2">Opening Stock</label>
                     <input
+                      id="qaProdCurrentStock"
+                      name="qaProdCurrentStock"
+                      autoComplete="off"
                       type="number"
                       min="0"
                       value={newProductData.currentStock}
@@ -1377,8 +1431,11 @@ export default function Purchases() {
                     <p className="text-xs text-slate-500 mt-1">Stock will be added from this purchase</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Alert Quantity</label>
+                    <label htmlFor="qaProdAlertQuantity" className="block text-sm font-medium text-slate-300 mb-2">Alert Quantity</label>
                     <input
+                      id="qaProdAlertQuantity"
+                      name="qaProdAlertQuantity"
+                      autoComplete="off"
                       type="number"
                       min="0"
                       value={newProductData.alertQuantity}
@@ -1388,13 +1445,15 @@ export default function Purchases() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label htmlFor="qaProdExpiryDate" className="block text-sm font-medium text-slate-300 mb-2">
                       <span className="flex items-center gap-1">
                         Expiry Date
                         <span className="text-yellow-400">⏰</span>
                       </span>
                     </label>
                     <input
+                      id="qaProdExpiryDate"
+                      name="qaProdExpiryDate"
                       type="date"
                       value={newProductData.expiryDate}
                       onChange={(e) => setNewProductData({ ...newProductData, expiryDate: e.target.value })}
@@ -1404,10 +1463,11 @@ export default function Purchases() {
                   </div>
                 </div>
 
-                {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                  <label htmlFor="qaProdDescription" className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                   <textarea
+                    id="qaProdDescription"
+                    name="qaProdDescription"
                     value={newProductData.description}
                     onChange={(e) => setNewProductData({ ...newProductData, description: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1416,7 +1476,6 @@ export default function Purchases() {
                   />
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
                   <button
                     type="button"
@@ -1438,7 +1497,7 @@ export default function Purchases() {
         </div>
       )}
 
-      {/* View Purchase Modal - with Expiry Info */}
+      {/* View Purchase Modal */}
       {showViewModal && selectedPurchase && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -1478,7 +1537,6 @@ export default function Purchases() {
                 </div>
               </div>
 
-              {/* Items Table with Expiry */}
               <div className="bg-slate-900/50 rounded-xl overflow-hidden">
                 <table className="w-full">
                   <thead>
@@ -1570,7 +1628,6 @@ export default function Purchases() {
   )
 }
 
-// Payment Modal Component
 function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }) {
   const [amount, setAmount] = useState((purchase.total || 0) - (purchase.amountPaid || 0))
   const [method, setMethod] = useState('cash')
@@ -1605,10 +1662,10 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md">
-        <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col">
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-white">Add Payment</h2>
+            <h2 className="text-lg font-bold text-white">Add Payment</h2>
             <p className="text-cyan-400 text-sm">{purchase.purchaseNo}</p>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white">
@@ -1618,7 +1675,7 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="bg-slate-900/50 rounded-xl p-4 space-y-2">
             <div className="flex justify-between">
               <span className="text-slate-400">Total Amount</span>
@@ -1636,8 +1693,11 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Payment Amount *</label>
+            <label htmlFor="paymtAmount" className="block text-sm font-medium text-slate-300 mb-2">Payment Amount *</label>
             <input
+              id="paymtAmount"
+              name="paymtAmount"
+              autoComplete="off"
               type="number"
               min="0"
               max={dueAmount}
@@ -1650,8 +1710,10 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
+            <label htmlFor="paymtMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
             <select
+              id="paymtMethod"
+              name="paymtMethod"
               value={method}
               onChange={(e) => setMethod(e.target.value)}
               className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1664,8 +1726,10 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
+            <label htmlFor="paymtAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
             <select
+              id="paymtAccountId"
+              name="paymtAccountId"
               value={paymentAccountId}
               onChange={(e) => setPaymentAccountId(e.target.value)}
               className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -1681,8 +1745,11 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Note</label>
+            <label htmlFor="paymtNote" className="block text-sm font-medium text-slate-300 mb-2">Note</label>
             <input
+              id="paymtNote"
+              name="paymtNote"
+              autoComplete="off"
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -1690,23 +1757,23 @@ function PaymentModal({ purchase, business, paymentAccounts, onClose, dispatch }
               placeholder="Payment note (optional)"
             />
           </div>
+        </div>
 
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
-            >
-              Add Payment
-            </button>
-          </div>
-        </form>
+        <div className="p-4 border-t border-slate-700 flex justify-end gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-lg hover:from-emerald-600 hover:to-cyan-600 transition-all"
+          >
+            Add Payment
+          </button>
+        </div>
       </div>
     </div>
   )

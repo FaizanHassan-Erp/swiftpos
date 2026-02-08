@@ -211,13 +211,13 @@ export default function ReceiptPrinters() {
   }
 
   // Toggle component
-  const Toggle = ({ enabled, onChange, label }) => (
-    <label className="flex items-center gap-3 cursor-pointer">
+  const Toggle = ({ id, name, enabled, onChange, label }) => (
+    <label htmlFor={id} className="flex items-center gap-3 cursor-pointer">
       <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
         <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
       </div>
       <span className="text-slate-300">{label}</span>
-      <input type="checkbox" className="sr-only" checked={enabled} onChange={onChange} />
+      <input type="checkbox" id={id} name={name} className="sr-only" checked={enabled} onChange={onChange} />
     </label>
   )
 
@@ -344,6 +344,9 @@ export default function ReceiptPrinters() {
           <h2 className="text-lg font-semibold text-white">All Printers</h2>
           <div className="relative">
             <input
+              id="rpSearch"
+              name="rpSearch"
+              autoComplete="off"
               type="text"
               placeholder="Search printers..."
               value={searchTerm}
@@ -510,10 +513,13 @@ export default function ReceiptPrinters() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label htmlFor="rpName" className="block text-sm font-medium text-slate-300 mb-2">
                       Printer Name <span className="text-red-400">*</span>
                     </label>
                     <input
+                      id="rpName"
+                      name="rpName"
+                      autoComplete="off"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleChange('name', e.target.value)}
@@ -523,8 +529,11 @@ export default function ReceiptPrinters() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                    <label htmlFor="rpLocation" className="block text-sm font-medium text-slate-300 mb-2">Location</label>
                     <input
+                      id="rpLocation"
+                      name="rpLocation"
+                      autoComplete="off"
                       type="text"
                       value={formData.location}
                       onChange={(e) => handleChange('location', e.target.value)}
@@ -568,10 +577,13 @@ export default function ReceiptPrinters() {
                 {formData.connectionType === 'network' && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                      <label htmlFor="rpIpAddress" className="block text-sm font-medium text-slate-300 mb-2">
                         IP Address <span className="text-red-400">*</span>
                       </label>
                       <input
+                        id="rpIpAddress"
+                        name="rpIpAddress"
+                        autoComplete="off"
                         type="text"
                         value={formData.ipAddress}
                         onChange={(e) => handleChange('ipAddress', e.target.value)}
@@ -580,8 +592,11 @@ export default function ReceiptPrinters() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Port</label>
+                      <label htmlFor="rpPort" className="block text-sm font-medium text-slate-300 mb-2">Port</label>
                       <input
+                        id="rpPort"
+                        name="rpPort"
+                        autoComplete="off"
                         type="text"
                         value={formData.port}
                         onChange={(e) => handleChange('port', e.target.value)}
@@ -603,8 +618,10 @@ export default function ReceiptPrinters() {
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Paper Width</label>
+                    <label htmlFor="rpPaperWidth" className="block text-sm font-medium text-slate-300 mb-2">Paper Width</label>
                     <select
+                      id="rpPaperWidth"
+                      name="rpPaperWidth"
                       value={formData.paperWidth}
                       onChange={(e) => handleChange('paperWidth', e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -615,8 +632,10 @@ export default function ReceiptPrinters() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Characters Per Line</label>
+                    <label htmlFor="rpCharPerLine" className="block text-sm font-medium text-slate-300 mb-2">Characters Per Line</label>
                     <input
+                      id="rpCharPerLine"
+                      name="rpCharPerLine"
                       type="number"
                       value={formData.characterPerLine}
                       onChange={(e) => handleChange('characterPerLine', parseInt(e.target.value) || 42)}
@@ -636,14 +655,16 @@ export default function ReceiptPrinters() {
                 </h3>
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-4">
-                    <Toggle enabled={formData.printSaleReceipt} onChange={() => handleChange('printSaleReceipt', !formData.printSaleReceipt)} label="Sale Receipts" />
-                    <Toggle enabled={formData.printKitchenOrder} onChange={() => handleChange('printKitchenOrder', !formData.printKitchenOrder)} label="Kitchen Orders" />
-                    <Toggle enabled={formData.printQuotation} onChange={() => handleChange('printQuotation', !formData.printQuotation)} label="Quotations" />
-                    <Toggle enabled={formData.autoPrint} onChange={() => handleChange('autoPrint', !formData.autoPrint)} label="Auto Print" />
+                    <Toggle id="rpPrintSaleReceipt" name="rpPrintSaleReceipt" enabled={formData.printSaleReceipt} onChange={() => handleChange('printSaleReceipt', !formData.printSaleReceipt)} label="Sale Receipts" />
+                    <Toggle id="rpPrintKitchenOrder" name="rpPrintKitchenOrder" enabled={formData.printKitchenOrder} onChange={() => handleChange('printKitchenOrder', !formData.printKitchenOrder)} label="Kitchen Orders" />
+                    <Toggle id="rpPrintQuotation" name="rpPrintQuotation" enabled={formData.printQuotation} onChange={() => handleChange('printQuotation', !formData.printQuotation)} label="Quotations" />
+                    <Toggle id="rpAutoPrint" name="rpAutoPrint" enabled={formData.autoPrint} onChange={() => handleChange('autoPrint', !formData.autoPrint)} label="Auto Print" />
                   </div>
                   <div className="pt-3">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Number of Copies</label>
+                    <label htmlFor="rpNumberOfCopies" className="block text-sm font-medium text-slate-300 mb-2">Number of Copies</label>
                     <input
+                      id="rpNumberOfCopies"
+                      name="rpNumberOfCopies"
                       type="number"
                       value={formData.numberOfCopies}
                       onChange={(e) => handleChange('numberOfCopies', parseInt(e.target.value) || 1)}
@@ -665,15 +686,15 @@ export default function ReceiptPrinters() {
                 </h3>
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-4">
-                    <Toggle enabled={formData.showLogo} onChange={() => handleChange('showLogo', !formData.showLogo)} label="Business Logo" />
-                    <Toggle enabled={formData.showBusinessName} onChange={() => handleChange('showBusinessName', !formData.showBusinessName)} label="Business Name" />
-                    <Toggle enabled={formData.showBusinessAddress} onChange={() => handleChange('showBusinessAddress', !formData.showBusinessAddress)} label="Business Address" />
-                    <Toggle enabled={formData.showBusinessPhone} onChange={() => handleChange('showBusinessPhone', !formData.showBusinessPhone)} label="Business Phone" />
-                    <Toggle enabled={formData.showTaxNumber} onChange={() => handleChange('showTaxNumber', !formData.showTaxNumber)} label="Tax Number" />
-                    <Toggle enabled={formData.showCustomerInfo} onChange={() => handleChange('showCustomerInfo', !formData.showCustomerInfo)} label="Customer Info" />
-                    <Toggle enabled={formData.showPaymentInfo} onChange={() => handleChange('showPaymentInfo', !formData.showPaymentInfo)} label="Payment Info" />
-                    <Toggle enabled={formData.showBarcode} onChange={() => handleChange('showBarcode', !formData.showBarcode)} label="Barcode" />
-                    <Toggle enabled={formData.showQRCode} onChange={() => handleChange('showQRCode', !formData.showQRCode)} label="QR Code" />
+                    <Toggle id="rpShowLogo" name="rpShowLogo" enabled={formData.showLogo} onChange={() => handleChange('showLogo', !formData.showLogo)} label="Business Logo" />
+                    <Toggle id="rpShowBusinessName" name="rpShowBusinessName" enabled={formData.showBusinessName} onChange={() => handleChange('showBusinessName', !formData.showBusinessName)} label="Business Name" />
+                    <Toggle id="rpShowBusinessAddress" name="rpShowBusinessAddress" enabled={formData.showBusinessAddress} onChange={() => handleChange('showBusinessAddress', !formData.showBusinessAddress)} label="Business Address" />
+                    <Toggle id="rpShowBusinessPhone" name="rpShowBusinessPhone" enabled={formData.showBusinessPhone} onChange={() => handleChange('showBusinessPhone', !formData.showBusinessPhone)} label="Business Phone" />
+                    <Toggle id="rpShowTaxNumber" name="rpShowTaxNumber" enabled={formData.showTaxNumber} onChange={() => handleChange('showTaxNumber', !formData.showTaxNumber)} label="Tax Number" />
+                    <Toggle id="rpShowCustomerInfo" name="rpShowCustomerInfo" enabled={formData.showCustomerInfo} onChange={() => handleChange('showCustomerInfo', !formData.showCustomerInfo)} label="Customer Info" />
+                    <Toggle id="rpShowPaymentInfo" name="rpShowPaymentInfo" enabled={formData.showPaymentInfo} onChange={() => handleChange('showPaymentInfo', !formData.showPaymentInfo)} label="Payment Info" />
+                    <Toggle id="rpShowBarcode" name="rpShowBarcode" enabled={formData.showBarcode} onChange={() => handleChange('showBarcode', !formData.showBarcode)} label="Barcode" />
+                    <Toggle id="rpShowQRCode" name="rpShowQRCode" enabled={formData.showQRCode} onChange={() => handleChange('showQRCode', !formData.showQRCode)} label="QR Code" />
                   </div>
                 </div>
               </div>
@@ -681,8 +702,11 @@ export default function ReceiptPrinters() {
               {/* Header/Footer */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Header Text</label>
+                  <label htmlFor="rpHeaderText" className="block text-sm font-medium text-slate-300 mb-2">Header Text</label>
                   <textarea
+                    id="rpHeaderText"
+                    name="rpHeaderText"
+                    autoComplete="off"
                     value={formData.headerText}
                     onChange={(e) => handleChange('headerText', e.target.value)}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 resize-none"
@@ -691,8 +715,11 @@ export default function ReceiptPrinters() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Footer Text</label>
+                  <label htmlFor="rpFooterText" className="block text-sm font-medium text-slate-300 mb-2">Footer Text</label>
                   <textarea
+                    id="rpFooterText"
+                    name="rpFooterText"
+                    autoComplete="off"
                     value={formData.footerText}
                     onChange={(e) => handleChange('footerText', e.target.value)}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 resize-none"

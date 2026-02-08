@@ -44,7 +44,7 @@ export default function SalesAgents() {
     if (editingAgent) {
       dispatch({ type: 'UPDATE_SALES_AGENT', payload: { ...editingAgent, ...formData } })
     } else {
-      dispatch({ type: 'ADD_SALES_AGENT', payload: formData })
+      dispatch({ type: 'ADD_SALES_AGENT', payload: { ...formData, id: Date.now().toString() } })
     }
     
     setShowModal(false)
@@ -81,13 +81,17 @@ export default function SalesAgents() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="agentPageSize" name="agentPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
           <div className="relative">
             <input
+              id="agentSearch"
+              name="agentSearch"
+              autoComplete="off"
+              aria-label="Search sales agents"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -116,8 +120,8 @@ export default function SalesAgents() {
                   <td colSpan="6" className="text-center py-8 text-slate-500">No data available in table</td>
                 </tr>
               ) : (
-                filteredAgents.map(agent => (
-                  <tr key={agent.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
+                filteredAgents.map((agent, index) => (
+                  <tr key={agent.id || `agent-${index}`} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3 text-white">{agent.name}</td>
                     <td className="px-4 py-3 text-slate-300">{agent.email || '-'}</td>
                     <td className="px-4 py-3 text-slate-300">{agent.phone || '-'}</td>
@@ -178,8 +182,11 @@ export default function SalesAgents() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
+                <label htmlFor="agentName" className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
                 <input
+                  id="agentName"
+                  name="agentName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -190,8 +197,11 @@ export default function SalesAgents() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                  <label htmlFor="agentEmail" className="block text-sm font-medium text-slate-300 mb-2">Email</label>
                   <input
+                    id="agentEmail"
+                    name="agentEmail"
+                    autoComplete="off"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -200,8 +210,11 @@ export default function SalesAgents() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Contact Number</label>
+                  <label htmlFor="agentPhone" className="block text-sm font-medium text-slate-300 mb-2">Contact Number</label>
                   <input
+                    id="agentPhone"
+                    name="agentPhone"
+                    autoComplete="off"
                     type="text"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -212,8 +225,11 @@ export default function SalesAgents() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Address</label>
+                <label htmlFor="agentAddress" className="block text-sm font-medium text-slate-300 mb-2">Address</label>
                 <input
+                  id="agentAddress"
+                  name="agentAddress"
+                  autoComplete="off"
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -223,8 +239,11 @@ export default function SalesAgents() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Sales Commission Percentage (%) *</label>
+                <label htmlFor="agentCommission" className="block text-sm font-medium text-slate-300 mb-2">Sales Commission Percentage (%) *</label>
                 <input
+                  id="agentCommission"
+                  name="agentCommission"
+                  autoComplete="off"
                   type="number"
                   step="0.01"
                   min="0"

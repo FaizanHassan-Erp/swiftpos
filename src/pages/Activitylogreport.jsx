@@ -182,8 +182,10 @@ export default function Activitylogreport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+            <label htmlFor="alrStartDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
             <input
+              id="alrStartDate"
+              name="alrStartDate"
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
@@ -191,8 +193,10 @@ export default function Activitylogreport() {
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">End Date</label>
+            <label htmlFor="alrEndDate" className="block text-sm text-slate-400 mb-1">End Date</label>
             <input
+              id="alrEndDate"
+              name="alrEndDate"
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
@@ -200,8 +204,10 @@ export default function Activitylogreport() {
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Module</label>
+            <label htmlFor="alrModule" className="block text-sm text-slate-400 mb-1">Module</label>
             <select
+              id="alrModule"
+              name="alrModule"
               value={moduleFilter}
               onChange={(e) => setModuleFilter(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -213,8 +219,10 @@ export default function Activitylogreport() {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Action Type</label>
+            <label htmlFor="alrAction" className="block text-sm text-slate-400 mb-1">Action Type</label>
             <select
+              id="alrAction"
+              name="alrAction"
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -226,8 +234,10 @@ export default function Activitylogreport() {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">User</label>
+            <label htmlFor="alrUser" className="block text-sm text-slate-400 mb-1">User</label>
             <select
+              id="alrUser"
+              name="alrUser"
               value={userFilter}
               onChange={(e) => setUserFilter(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -239,8 +249,11 @@ export default function Activitylogreport() {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Search</label>
+            <label htmlFor="alrSearch" className="block text-sm text-slate-400 mb-1">Search</label>
             <input
+              id="alrSearch"
+              name="alrSearch"
+              autoComplete="off"
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

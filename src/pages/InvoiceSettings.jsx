@@ -218,15 +218,18 @@ export default function InvoiceSettings() {
   }
 
   // Toggle component
-  const Toggle = ({ enabled, onChange, label }) => (
-    <label className="flex items-center gap-3 cursor-pointer">
-      <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
-        <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
-      </div>
-      <span className="text-slate-300">{label}</span>
-      <input type="checkbox" className="sr-only" checked={enabled} onChange={onChange} />
-    </label>
-  )
+  const Toggle = ({ enabled, onChange, label }) => {
+    const toggleId = 'is' + label.replace(/[^a-zA-Z0-9]/g, '')
+    return (
+      <label className="flex items-center gap-3 cursor-pointer">
+        <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
+          <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
+        </div>
+        <span className="text-slate-300">{label}</span>
+        <input type="checkbox" className="sr-only" id={toggleId} name={toggleId} checked={enabled} onChange={onChange} />
+      </label>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -290,6 +293,10 @@ export default function InvoiceSettings() {
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  id="isSearchSchemes"
+                  name="isSearchSchemes"
+                  aria-label="Search invoice schemes"
+                  autoComplete="off"
                   className="w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500 pl-10"
                 />
                 <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -424,6 +431,10 @@ export default function InvoiceSettings() {
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  id="isSearchLayouts"
+                  name="isSearchLayouts"
+                  aria-label="Search invoice layouts"
+                  autoComplete="off"
                   className="w-48 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500 pl-10"
                 />
                 <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -596,11 +607,14 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="isSchemeName" className="block text-sm font-medium text-slate-300 mb-2">
                     Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
+                    id="isSchemeName"
+                    name="isSchemeName"
+                    autoComplete="off"
                     value={schemeForm.name}
                     onChange={(e) => setSchemeForm(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -610,9 +624,12 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Prefix</label>
+                  <label htmlFor="isSchemePrefix" className="block text-sm font-medium text-slate-300 mb-2">Prefix</label>
                   <input
                     type="text"
+                    id="isSchemePrefix"
+                    name="isSchemePrefix"
+                    autoComplete="off"
                     value={schemeForm.prefix}
                     onChange={(e) => setSchemeForm(prev => ({ ...prev, prefix: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -621,11 +638,13 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="isNumberingType" className="block text-sm font-medium text-slate-300 mb-2">
                     Numbering Type <span className="text-red-400">*</span>
                     <span className="ml-1 text-emerald-400 cursor-help" title="Sequential: 1,2,3... Random: Random numbers">ⓘ</span>
                   </label>
                   <select
+                    id="isNumberingType"
+                    name="isNumberingType"
                     value={schemeForm.numberingType}
                     onChange={(e) => setSchemeForm(prev => ({ ...prev, numberingType: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -637,9 +656,11 @@ export default function InvoiceSettings() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Start From</label>
+                    <label htmlFor="isStartFrom" className="block text-sm font-medium text-slate-300 mb-2">Start From</label>
                     <input
                       type="number"
+                      id="isStartFrom"
+                      name="isStartFrom"
                       value={schemeForm.startFrom}
                       onChange={(e) => setSchemeForm(prev => ({ ...prev, startFrom: e.target.value }))}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -647,9 +668,11 @@ export default function InvoiceSettings() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Number of Digits</label>
+                    <label htmlFor="isNumberOfDigits" className="block text-sm font-medium text-slate-300 mb-2">Number of Digits</label>
                     <input
                       type="number"
+                      id="isNumberOfDigits"
+                      name="isNumberOfDigits"
                       value={schemeForm.numberOfDigits}
                       onChange={(e) => setSchemeForm(prev => ({ ...prev, numberOfDigits: e.target.value }))}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -679,11 +702,14 @@ export default function InvoiceSettings() {
               /* Invoice Layout Form */
               <form onSubmit={handleSaveLayout} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="isLayoutName" className="block text-sm font-medium text-slate-300 mb-2">
                     Name <span className="text-red-400">*</span>
                   </label>
                   <input
                     type="text"
+                    id="isLayoutName"
+                    name="isLayoutName"
+                    autoComplete="off"
                     value={layoutForm.name}
                     onChange={(e) => setLayoutForm(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -694,8 +720,10 @@ export default function InvoiceSettings() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Type</label>
+                    <label htmlFor="isLayoutType" className="block text-sm font-medium text-slate-300 mb-2">Type</label>
                     <select
+                      id="isLayoutType"
+                      name="isLayoutType"
                       value={layoutForm.type}
                       onChange={(e) => setLayoutForm(prev => ({ ...prev, type: e.target.value }))}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -706,8 +734,10 @@ export default function InvoiceSettings() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Paper Size</label>
+                    <label htmlFor="isPaperSize" className="block text-sm font-medium text-slate-300 mb-2">Paper Size</label>
                     <select
+                      id="isPaperSize"
+                      name="isPaperSize"
                       value={layoutForm.paperSize}
                       onChange={(e) => setLayoutForm(prev => ({ ...prev, paperSize: e.target.value }))}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -734,9 +764,12 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Header Text</label>
+                  <label htmlFor="isHeaderText" className="block text-sm font-medium text-slate-300 mb-2">Header Text</label>
                   <input
                     type="text"
+                    id="isHeaderText"
+                    name="isHeaderText"
+                    autoComplete="off"
                     value={layoutForm.headerText}
                     onChange={(e) => setLayoutForm(prev => ({ ...prev, headerText: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -745,9 +778,12 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Footer Text</label>
+                  <label htmlFor="isFooterText" className="block text-sm font-medium text-slate-300 mb-2">Footer Text</label>
                   <input
                     type="text"
+                    id="isFooterText"
+                    name="isFooterText"
+                    autoComplete="off"
                     value={layoutForm.footerText}
                     onChange={(e) => setLayoutForm(prev => ({ ...prev, footerText: e.target.value }))}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -756,8 +792,10 @@ export default function InvoiceSettings() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Terms & Conditions</label>
+                  <label htmlFor="isTermsAndConditions" className="block text-sm font-medium text-slate-300 mb-2">Terms & Conditions</label>
                   <textarea
+                    id="isTermsAndConditions"
+                    name="isTermsAndConditions"
                     value={layoutForm.termsAndConditions}
                     onChange={(e) => setLayoutForm(prev => ({ ...prev, termsAndConditions: e.target.value }))}
                     rows={3}

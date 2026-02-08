@@ -210,6 +210,19 @@ export default function Paymentaccounts() {
       })
     })
 
+    // Expense payments
+    safeExpenses.filter(e => isSameId(e.paymentAccountId, accountId)).forEach(e => {
+      transactions.push({
+        date: e.date || e.createdAt,
+        description: `Expense - ${e.note || e.referenceNo || 'General'}`,
+        type: 'expense',
+        debit: parseFloat(e.amountPaid) || 0,
+        credit: 0,
+        paymentMethod: e.paymentMethod || 'Cash',
+        addedBy: e.addedBy || 'Admin'
+      })
+    })
+
     // Sort by date and calculate running balance
     transactions.sort((a, b) => new Date(a.date) - new Date(b.date))
     let runningBalance = 0
@@ -308,6 +321,20 @@ export default function Paymentaccounts() {
         description: `Purchase - Supplier: ${supplier?.name || 'Unknown'}`,
         paymentMethod: p.paymentMethod || 'Cash',
         debit: parseFloat(p.amountPaid) || 0,
+        credit: 0
+      })
+    })
+
+    // Expenses with linked accounts
+    safeExpenses.filter(e => e.paymentAccountId).forEach(e => {
+      const account = safePaymentAccounts.find(a => isSameId(a.id, e.paymentAccountId))
+      transactions.push({
+        date: e.date || e.createdAt,
+        account: account?.name || 'Unknown',
+        accountId: e.paymentAccountId,
+        description: `Expense - ${e.note || e.referenceNo || 'General'}`,
+        paymentMethod: e.paymentMethod || 'Cash',
+        debit: parseFloat(e.amountPaid) || 0,
         credit: 0
       })
     })
@@ -506,7 +533,8 @@ export default function Paymentaccounts() {
     if (modalType === 'edit-account') {
       dispatch({ type: 'UPDATE_PAYMENT_ACCOUNT', payload: { id: selectedAccount.id, ...accountData } })
     } else {
-      dispatch({ type: 'ADD_PAYMENT_ACCOUNT', payload: accountData })
+      // Generate temp ID so the account can be properly tracked before Firestore assigns real ID
+      dispatch({ type: 'ADD_PAYMENT_ACCOUNT', payload: { ...accountData, id: Date.now().toString() } })
     }
     setShowModal(false)
   }
@@ -530,10 +558,10 @@ export default function Paymentaccounts() {
     const fromAcc = safePaymentAccounts.find(a => isSameId(a.id, transferData.fromAccount))
     const toAcc = safePaymentAccounts.find(a => isSameId(a.id, transferData.toAccount))
 
-    // IMPORTANT: Convert account IDs to numbers for consistent comparison
+    // FIXED: Keep IDs as strings - Firestore uses string IDs
     const transferPayload = {
-      fromAccount: parseInt(transferData.fromAccount) || transferData.fromAccount,
-      toAccount: parseInt(transferData.toAccount) || transferData.toAccount,
+      fromAccount: transferData.fromAccount,
+      toAccount: transferData.toAccount,
       amount: parseFloat(transferData.amount),
       date: transferData.date,
       note: transferData.note || `Transfer from ${fromAcc?.name} to ${toAcc?.name}`,
@@ -559,7 +587,7 @@ export default function Paymentaccounts() {
     }
 
     const depositPayload = {
-      accountId: parseInt(depositData.accountId) || depositData.accountId,
+      accountId: depositData.accountId,
       amount: parseFloat(depositData.amount),
       date: depositData.date,
       paymentMethod: depositData.paymentMethod,
@@ -594,11 +622,10 @@ export default function Paymentaccounts() {
   }
 
   const linkPaymentToAccount = (payment, accountId) => {
-    const numericAccountId = parseInt(accountId)
     if (payment.type === 'sale') {
-      dispatch({ type: 'UPDATE_SALE', payload: { id: payment.id, paymentAccountId: numericAccountId } })
+      dispatch({ type: 'UPDATE_SALE', payload: { id: payment.id, paymentAccountId: accountId } })
     } else {
-      dispatch({ type: 'UPDATE_PURCHASE', payload: { id: payment.id, paymentAccountId: numericAccountId } })
+      dispatch({ type: 'UPDATE_PURCHASE', payload: { id: payment.id, paymentAccountId: accountId } })
     }
   }
 
@@ -681,13 +708,13 @@ export default function Paymentaccounts() {
       {activeTab === 'accounts' && (
         <div className="space-y-4">
           <div className="flex gap-4 items-center">
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+            <select id="paFilterStatus" name="paFilterStatus" aria-label="Filter by account status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
               <option value="active">Active</option>
               <option value="closed">Closed</option>
               <option value="all">All</option>
             </select>
-            <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+            <input id="paSearch" name="paSearch" autoComplete="off" aria-label="Search payment accounts" type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
               className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white flex-1 max-w-xs" />
           </div>
 
@@ -913,7 +940,7 @@ export default function Paymentaccounts() {
                     <td className="p-3 text-slate-300 text-sm">{payment.paymentType}</td>
                     <td className="p-3 text-slate-300 text-sm">{payment.description}</td>
                     <td className="p-3 text-center">
-                      <select onChange={(e) => { if (e.target.value) { linkPaymentToAccount(payment, e.target.value); e.target.value = '' } }}
+                      <select aria-label={`Link account for ${payment.paymentRefNo}`} onChange={(e) => { if (e.target.value) { linkPaymentToAccount(payment, e.target.value); e.target.value = '' } }}
                         className="px-2 py-1 bg-slate-700 border border-slate-600 rounded text-white text-xs">
                         <option value="">Link Account</option>
                         {safePaymentAccounts.filter(a => a.status !== 'closed').map(acc => (
@@ -941,23 +968,23 @@ export default function Paymentaccounts() {
                   <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white text-xl">×</button>
                 </div>
                 <div className="p-4 space-y-4">
-                  <div><label className="block text-sm text-slate-300 mb-1">Name: *</label>
-                    <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  <div><label htmlFor="paAccName" className="block text-sm text-slate-300 mb-1">Name: *</label>
+                    <input id="paAccName" name="paAccName" autoComplete="off" type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Account Name" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Account Number:</label>
-                    <input type="text" value={formData.accountNumber} onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
+                  <div><label htmlFor="paAccNumber" className="block text-sm text-slate-300 mb-1">Account Number:</label>
+                    <input id="paAccNumber" name="paAccNumber" autoComplete="off" type="text" value={formData.accountNumber} onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Account Number" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Account Type:</label>
-                    <select value={formData.accountType} onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
+                  <div><label htmlFor="paAccType" className="block text-sm text-slate-300 mb-1">Account Type:</label>
+                    <select id="paAccType" name="paAccType" value={formData.accountType} onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                       <option value="">Select Type</option>
                       {allAccountTypes.map(type => <option key={type.id} value={type.name}>{type.name}</option>)}
                     </select></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Opening Balance:</label>
-                    <input type="number" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: e.target.value })}
+                  <div><label htmlFor="paAccOpenBal" className="block text-sm text-slate-300 mb-1">Opening Balance:</label>
+                    <input id="paAccOpenBal" name="paAccOpenBal" autoComplete="off" type="number" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="0" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Note:</label>
-                    <textarea value={formData.note} onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                  <div><label htmlFor="paAccNote" className="block text-sm text-slate-300 mb-1">Note:</label>
+                    <textarea id="paAccNote" name="paAccNote" value={formData.note} onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" /></div>
                 </div>
                 <div className="p-4 border-t border-slate-700 flex justify-end gap-2">
@@ -975,8 +1002,8 @@ export default function Paymentaccounts() {
                   <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white text-xl">×</button>
                 </div>
                 <div className="p-4 space-y-4">
-                  <div><label className="block text-sm text-slate-300 mb-1">Transfer from: *</label>
-                    <select value={transferData.fromAccount} onChange={(e) => setTransferData({ ...transferData, fromAccount: e.target.value })}
+                  <div><label htmlFor="paXferFrom" className="block text-sm text-slate-300 mb-1">Transfer from: *</label>
+                    <select id="paXferFrom" name="paXferFrom" value={transferData.fromAccount} onChange={(e) => setTransferData({ ...transferData, fromAccount: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                       <option value="">Select Account</option>
                       {safePaymentAccounts.filter(a => a.status !== 'closed').map(acc => (
@@ -984,8 +1011,8 @@ export default function Paymentaccounts() {
                       ))}
                     </select>
                   </div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Transfer To: *</label>
-                    <select value={transferData.toAccount} onChange={(e) => setTransferData({ ...transferData, toAccount: e.target.value })}
+                  <div><label htmlFor="paXferTo" className="block text-sm text-slate-300 mb-1">Transfer To: *</label>
+                    <select id="paXferTo" name="paXferTo" value={transferData.toAccount} onChange={(e) => setTransferData({ ...transferData, toAccount: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                       <option value="">Select Account</option>
                       {safePaymentAccounts.filter(a => a.status !== 'closed' && String(a.id) !== String(transferData.fromAccount)).map(acc => (
@@ -993,14 +1020,14 @@ export default function Paymentaccounts() {
                       ))}
                     </select>
                   </div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Amount: *</label>
-                    <input type="number" value={transferData.amount} onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
+                  <div><label htmlFor="paXferAmount" className="block text-sm text-slate-300 mb-1">Amount: *</label>
+                    <input id="paXferAmount" name="paXferAmount" autoComplete="off" type="number" value={transferData.amount} onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="0" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Date: *</label>
-                    <input type="date" value={transferData.date} onChange={(e) => setTransferData({ ...transferData, date: e.target.value })}
+                  <div><label htmlFor="paXferDate" className="block text-sm text-slate-300 mb-1">Date: *</label>
+                    <input id="paXferDate" name="paXferDate" type="date" value={transferData.date} onChange={(e) => setTransferData({ ...transferData, date: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Note:</label>
-                    <textarea value={transferData.note} onChange={(e) => setTransferData({ ...transferData, note: e.target.value })}
+                  <div><label htmlFor="paXferNote" className="block text-sm text-slate-300 mb-1">Note:</label>
+                    <textarea id="paXferNote" name="paXferNote" value={transferData.note} onChange={(e) => setTransferData({ ...transferData, note: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="3" /></div>
                   
                   {/* Preview */}
@@ -1038,19 +1065,19 @@ export default function Paymentaccounts() {
                     <p className="text-slate-400 text-sm">Current Balance:</p>
                     <p className="text-emerald-400 font-semibold">{formatCurrency(calculateAccountBalance(selectedAccount))}</p>
                   </div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Amount: *</label>
-                    <input type="number" value={depositData.amount} onChange={(e) => setDepositData({ ...depositData, amount: e.target.value })}
+                  <div><label htmlFor="paDepAmount" className="block text-sm text-slate-300 mb-1">Amount: *</label>
+                    <input id="paDepAmount" name="paDepAmount" autoComplete="off" type="number" value={depositData.amount} onChange={(e) => setDepositData({ ...depositData, amount: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="0" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Date: *</label>
-                    <input type="date" value={depositData.date} onChange={(e) => setDepositData({ ...depositData, date: e.target.value })}
+                  <div><label htmlFor="paDepDate" className="block text-sm text-slate-300 mb-1">Date: *</label>
+                    <input id="paDepDate" name="paDepDate" type="date" value={depositData.date} onChange={(e) => setDepositData({ ...depositData, date: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Payment Method:</label>
-                    <select value={depositData.paymentMethod} onChange={(e) => setDepositData({ ...depositData, paymentMethod: e.target.value })}
+                  <div><label htmlFor="paDepMethod" className="block text-sm text-slate-300 mb-1">Payment Method:</label>
+                    <select id="paDepMethod" name="paDepMethod" value={depositData.paymentMethod} onChange={(e) => setDepositData({ ...depositData, paymentMethod: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                       <option value="Cash">Cash</option><option value="Bank Transfer">Bank Transfer</option><option value="Cheque">Cheque</option><option value="Other">Other</option>
                     </select></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Note:</label>
-                    <textarea value={depositData.note} onChange={(e) => setDepositData({ ...depositData, note: e.target.value })}
+                  <div><label htmlFor="paDepNote" className="block text-sm text-slate-300 mb-1">Note:</label>
+                    <textarea id="paDepNote" name="paDepNote" value={depositData.note} onChange={(e) => setDepositData({ ...depositData, note: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" /></div>
                 </div>
                 <div className="p-4 border-t border-slate-700 flex justify-end gap-2">
@@ -1113,11 +1140,11 @@ export default function Paymentaccounts() {
                   <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white text-xl">×</button>
                 </div>
                 <div className="p-4 space-y-4">
-                  <div><label className="block text-sm text-slate-300 mb-1">Name: *</label>
-                    <input type="text" value={accountTypeForm.name} onChange={(e) => setAccountTypeForm({ ...accountTypeForm, name: e.target.value })}
+                  <div><label htmlFor="paTypeName" className="block text-sm text-slate-300 mb-1">Name: *</label>
+                    <input id="paTypeName" name="paTypeName" autoComplete="off" type="text" value={accountTypeForm.name} onChange={(e) => setAccountTypeForm({ ...accountTypeForm, name: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Type Name" /></div>
-                  <div><label className="block text-sm text-slate-300 mb-1">Description:</label>
-                    <textarea value={accountTypeForm.description} onChange={(e) => setAccountTypeForm({ ...accountTypeForm, description: e.target.value })}
+                  <div><label htmlFor="paTypeDesc" className="block text-sm text-slate-300 mb-1">Description:</label>
+                    <textarea id="paTypeDesc" name="paTypeDesc" value={accountTypeForm.description} onChange={(e) => setAccountTypeForm({ ...accountTypeForm, description: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" /></div>
                 </div>
                 <div className="p-4 border-t border-slate-700 flex justify-end gap-2">

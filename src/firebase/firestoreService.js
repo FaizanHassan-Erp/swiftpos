@@ -72,9 +72,11 @@ export async function getBusinessSettings(businessId) {
 export async function addDocument(businessId, collectionName, data) {
   try {
     const colRef = getBusinessCollection(businessId, collectionName)
+    // Strip local-only fields before saving to Firestore
+    const { id, _tempId, ...cleanData } = data
     const docRef = await addDoc(colRef, {
-      ...data,
-      businessId, // Always include for security
+      ...cleanData,
+      businessId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     })
@@ -108,7 +110,7 @@ export async function getDocuments(businessId, collectionName) {
     const querySnapshot = await getDocs(colRef)
     const documents = []
     querySnapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() })
+      documents.push({ ...doc.data(), id: doc.id })
     })
     return { success: true, data: documents }
   } catch (error) {
@@ -136,8 +138,10 @@ export async function getDocument(businessId, collectionName, docId) {
 export async function updateDocument(businessId, collectionName, docId, data) {
   try {
     const docRef = doc(db, 'businesses', businessId, collectionName, docId)
+    // Strip local-only fields before saving to Firestore
+    const { id, _tempId, ...cleanData } = data
     await updateDoc(docRef, {
-      ...data,
+      ...cleanData,
       updatedAt: serverTimestamp()
     })
     return { success: true }
@@ -168,7 +172,7 @@ export function subscribeToCollection(businessId, collectionName, callback) {
   return onSnapshot(colRef, (snapshot) => {
     const documents = []
     snapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() })
+      documents.push({ ...doc.data(), id: doc.id })
     })
     callback(documents)
   }, (error) => {
@@ -231,7 +235,6 @@ export async function initializeNewBusiness(businessId, businessName, ownerName)
   try {
     const businessRef = getBusinessDoc(businessId)
     
-    // Default business settings
     const defaultSettings = {
       name: businessName || 'My Business',
       currency: 'PKR',
@@ -259,7 +262,6 @@ export async function initializeNewBusiness(businessId, businessName, ownerName)
       ]
     }
     
-    // Default data
     const defaultCustomer = {
       contactId: 'CU0001',
       contactType: 'customer',
@@ -281,6 +283,12 @@ export async function initializeNewBusiness(businessId, businessName, ownerName)
     
     const defaultCategories = [
       { name: 'General', code: 'GEN', description: '' }
+    ]
+
+    const defaultRoles = [
+      { name: 'Owner', description: 'Full access to everything', permissions: ['all'], isDefault: true },
+      { name: 'Admin', description: 'Full access except owner settings', permissions: ['all'], isDefault: true },
+      { name: 'Cashier', description: 'POS and basic sales access', permissions: ['pos', 'sales', 'customers'], isDefault: true }
     ]
     
     // Save business settings
@@ -311,6 +319,11 @@ export async function initializeNewBusiness(businessId, businessName, ownerName)
     for (const category of defaultCategories) {
       await addDocument(businessId, 'categories', category)
     }
+
+    // Add default roles
+    for (const role of defaultRoles) {
+      await addDocument(businessId, 'roles', role)
+    }
     
     return { success: true }
   } catch (error) {
@@ -335,7 +348,24 @@ export async function loadAllBusinessData(businessId) {
       categoriesResult,
       brandsResult,
       unitsResult,
-      countersResult
+      countersResult,
+      // ===== NEWLY ADDED COLLECTIONS =====
+      salesAgentsResult,
+      paymentAccountsResult,
+      salesPaymentsResult,
+      purchasePaymentsResult,
+      stockAdjustmentsResult,
+      saleReturnsResult,
+      purchaseReturnsResult,
+      taxRatesResult,
+      rolesResult,
+      activityLogsResult,
+      warrantiesResult,
+      expenseCategoriesResult,
+      accountTypesResult,
+      fundTransfersResult,
+      depositsResult,
+      registerSessionsResult
     ] = await Promise.all([
       getBusinessSettings(businessId),
       getDocuments(businessId, 'products'),
@@ -347,7 +377,24 @@ export async function loadAllBusinessData(businessId) {
       getDocuments(businessId, 'categories'),
       getDocuments(businessId, 'brands'),
       getDocuments(businessId, 'units'),
-      getDocuments(businessId, 'counters')
+      getDocuments(businessId, 'counters'),
+      // ===== NEWLY ADDED COLLECTIONS =====
+      getDocuments(businessId, 'salesAgents'),
+      getDocuments(businessId, 'paymentAccounts'),
+      getDocuments(businessId, 'salesPayments'),
+      getDocuments(businessId, 'purchasePayments'),
+      getDocuments(businessId, 'stockAdjustments'),
+      getDocuments(businessId, 'saleReturns'),
+      getDocuments(businessId, 'purchaseReturns'),
+      getDocuments(businessId, 'taxRates'),
+      getDocuments(businessId, 'roles'),
+      getDocuments(businessId, 'activityLogs'),
+      getDocuments(businessId, 'warranties'),
+      getDocuments(businessId, 'expenseCategories'),
+      getDocuments(businessId, 'accountTypes'),
+      getDocuments(businessId, 'fundTransfers'),
+      getDocuments(businessId, 'deposits'),
+      getDocuments(businessId, 'registerSessions')
     ])
     
     // Convert counters array to object
@@ -369,6 +416,24 @@ export async function loadAllBusinessData(businessId) {
         categories: categoriesResult.data || [],
         brands: brandsResult.data || [],
         units: unitsResult.data || [],
+        // ===== NEWLY ADDED =====
+        salesAgents: salesAgentsResult.data || [],
+        paymentAccounts: paymentAccountsResult.data || [],
+        salesPayments: salesPaymentsResult.data || [],
+        purchasePayments: purchasePaymentsResult.data || [],
+        stockAdjustments: stockAdjustmentsResult.data || [],
+        saleReturns: saleReturnsResult.data || [],
+        purchaseReturns: purchaseReturnsResult.data || [],
+        taxRates: taxRatesResult.data || [],
+        roles: rolesResult.data || [],
+        activityLogs: activityLogsResult.data || [],
+        warranties: warrantiesResult.data || [],
+        expenseCategories: expenseCategoriesResult.data || [],
+        accountTypes: accountTypesResult.data || [],
+        fundTransfers: fundTransfersResult.data || [],
+        deposits: depositsResult.data || [],
+        registerSessions: registerSessionsResult.data || [],
+        // Counters
         saleCounter: counters.sales || 0,
         purchaseCounter: counters.purchases || 0,
         expenseCounter: counters.expenses || 0,

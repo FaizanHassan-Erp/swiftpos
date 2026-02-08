@@ -3,7 +3,7 @@ import { useApp } from '../Context/AppContext'
 
 export default function Suppliers() {
   const { state, dispatch } = useApp()
-  const { suppliers, business, purchasePayments, purchaseReturns, products } = state
+  const { suppliers = [], business = {}, purchasePayments = [], purchaseReturns = [], products = [], purchases = [] } = state
   
   const [showModal, setShowModal] = useState(false)
   const [showViewModal, setShowViewModal] = useState(false)
@@ -153,35 +153,35 @@ export default function Suppliers() {
       }
     })
     setContactPersonForm({ username: '', name: '', email: '', department: '', designation: '' })
-    const updated = state.suppliers.find(s => s.id === selectedSupplier.id)
+    const updated = suppliers.find(s => s.id === selectedSupplier.id)
     if (updated) setSelectedSupplier({ ...updated, contactPersons: [...(updated.contactPersons || []), { ...contactPersonForm, id: Date.now() }] })
   }
 
   // Get supplier purchases
   const supplierPurchases = selectedSupplier 
-    ? state.purchases.filter(p => p.supplierId === selectedSupplier.id)
+    ? purchases.filter(p => p.supplierId === selectedSupplier.id)
     : []
 
   // Get supplier payments
   const supplierPayments = selectedSupplier
-    ? (purchasePayments || []).filter(p => p.supplierId === selectedSupplier.id)
+    ? purchasePayments.filter(p => p.supplierId === selectedSupplier.id)
     : []
 
   // Get supplier purchase returns
   const supplierPurchaseReturns = selectedSupplier
-    ? (purchaseReturns || []).filter(pr => pr.supplierId === selectedSupplier.id)
+    ? purchaseReturns.filter(pr => pr.supplierId === selectedSupplier.id)
     : []
 
   // Helper function to calculate actual paid amount for a specific purchase
   function getActualPaidForPurchase(purchaseId) {
-    return (purchasePayments || [])
+    return purchasePayments
       .filter(p => p.purchaseId === purchaseId)
       .reduce((sum, p) => sum + (p.amount || 0), 0)
   }
 
   // Helper function to get returns for a specific purchase
   function getReturnsForPurchase(purchaseId) {
-    return (purchaseReturns || [])
+    return purchaseReturns
       .filter(pr => pr.purchaseId === purchaseId)
       .reduce((sum, pr) => sum + (pr.total || 0), 0)
   }
@@ -260,7 +260,7 @@ export default function Suppliers() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="supPageSize" name="supPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -269,6 +269,10 @@ export default function Suppliers() {
           </div>
           <div className="relative">
             <input
+              id="supSearch"
+              name="supSearch"
+              autoComplete="off"
+              aria-label="Search suppliers"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -320,9 +324,9 @@ export default function Suppliers() {
                     <td className="px-4 py-3 text-slate-300">{supplier.email || '-'}</td>
                     <td className="px-4 py-3 text-slate-300">{supplier.taxNumber || '-'}</td>
                     <td className="px-4 py-3 text-slate-300">{supplier.payTerm || '-'}</td>
-                    <td className="px-4 py-3 text-slate-300">{business.currency} {(supplier.openingBalance || 0).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-emerald-400">{business.currency} {(supplier.advanceBalance || 0).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-slate-300">{supplier.createdAt || '-'}</td>
+                    <td className="px-4 py-3 text-slate-300">{business.currency || 'PKR'} {(supplier.openingBalance || 0).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-emerald-400">{business.currency || 'PKR'} {(supplier.advanceBalance || 0).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-slate-300">{supplier.createdAt ? (typeof supplier.createdAt === 'string' ? supplier.createdAt : supplier.createdAt.seconds ? new Date(supplier.createdAt.seconds * 1000).toLocaleDateString() : new Date(supplier.createdAt).toLocaleDateString()) : '-'}</td>
                     <td className="px-4 py-3 text-slate-300">{supplier.phone}</td>
                   </tr>
                 ))
@@ -341,7 +345,7 @@ export default function Suppliers() {
         </div>
       </div>
 
-      {/* Dropdown Portal - WITHOUT Pay option */}
+      {/* Dropdown Portal */}
       {activeDropdown && activeSupplier && (
         <>
           <div className="fixed inset-0 z-[9998]" onClick={() => setActiveDropdown(null)} />
@@ -406,14 +410,14 @@ export default function Suppliers() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Contact Type *</label>
-                  <select value={formData.contactType} onChange={(e) => setFormData({ ...formData, contactType: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                  <label htmlFor="supContactType" className="block text-sm font-medium text-slate-300 mb-2">Contact Type *</label>
+                  <select id="supContactType" name="supContactType" value={formData.contactType} onChange={(e) => setFormData({ ...formData, contactType: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
                     <option value="supplier">Suppliers</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Contact ID</label>
-                  <input type="text" value={editingSupplier?.contactId || 'Auto-generated'} disabled className="w-full px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-400" />
+                  <label htmlFor="supContactId" className="block text-sm font-medium text-slate-300 mb-2">Contact ID</label>
+                  <input id="supContactId" name="supContactId" type="text" value={editingSupplier?.contactId || 'Auto-generated'} disabled className="w-full px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-400" />
                   <p className="text-xs text-slate-500 mt-1">Leave empty to autogenerate</p>
                 </div>
               </div>
@@ -431,52 +435,52 @@ export default function Suppliers() {
 
               {formData.businessType === 'business' && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Business Name</label>
-                  <input type="text" value={formData.businessName} onChange={(e) => setFormData({ ...formData, businessName: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Business Name" />
+                  <label htmlFor="supBusinessName" className="block text-sm font-medium text-slate-300 mb-2">Business Name</label>
+                  <input id="supBusinessName" name="supBusinessName" autoComplete="organization" type="text" value={formData.businessName} onChange={(e) => setFormData({ ...formData, businessName: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Business Name" />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Mobile *</label>
-                  <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Mobile Number" />
+                  <label htmlFor="supPhone" className="block text-sm font-medium text-slate-300 mb-2">Mobile *</label>
+                  <input id="supPhone" name="supPhone" autoComplete="tel" type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Mobile Number" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Alternate Contact Number</label>
-                  <input type="text" value={formData.alternatePhone} onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Alternate Number" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Landline</label>
-                  <input type="text" value={formData.landline} onChange={(e) => setFormData({ ...formData, landline: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Landline" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Email" />
+                  <label htmlFor="supAlternatePhone" className="block text-sm font-medium text-slate-300 mb-2">Alternate Contact Number</label>
+                  <input id="supAlternatePhone" name="supAlternatePhone" autoComplete="tel" type="text" value={formData.alternatePhone} onChange={(e) => setFormData({ ...formData, alternatePhone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Alternate Number" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Name</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Contact Name" />
+                  <label htmlFor="supLandline" className="block text-sm font-medium text-slate-300 mb-2">Landline</label>
+                  <input id="supLandline" name="supLandline" autoComplete="tel" type="text" value={formData.landline} onChange={(e) => setFormData({ ...formData, landline: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Landline" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Tax Number</label>
-                  <input type="text" value={formData.taxNumber} onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Tax Number" />
+                  <label htmlFor="supEmail" className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                  <input id="supEmail" name="supEmail" autoComplete="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Email" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Opening Balance</label>
-                  <input type="number" step="0.01" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="0.00" />
+                  <label htmlFor="supName" className="block text-sm font-medium text-slate-300 mb-2">Name</label>
+                  <input id="supName" name="supName" autoComplete="name" type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Contact Name" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Pay Term</label>
-                  <select value={formData.payTerm} onChange={(e) => setFormData({ ...formData, payTerm: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                  <label htmlFor="supTaxNumber" className="block text-sm font-medium text-slate-300 mb-2">Tax Number</label>
+                  <input id="supTaxNumber" name="supTaxNumber" autoComplete="off" type="text" value={formData.taxNumber} onChange={(e) => setFormData({ ...formData, taxNumber: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="Tax Number" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="supOpeningBalance" className="block text-sm font-medium text-slate-300 mb-2">Opening Balance</label>
+                  <input id="supOpeningBalance" name="supOpeningBalance" autoComplete="off" type="number" step="0.01" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label htmlFor="supPayTerm" className="block text-sm font-medium text-slate-300 mb-2">Pay Term</label>
+                  <select id="supPayTerm" name="supPayTerm" value={formData.payTerm} onChange={(e) => setFormData({ ...formData, payTerm: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
                     <option value="">Select Pay Term</option>
                     <option value="Net 7">Net 7</option>
                     <option value="Net 15">Net 15</option>
@@ -488,8 +492,8 @@ export default function Suppliers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Address</label>
-                <textarea value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" rows="2" placeholder="Address" />
+                <label htmlFor="supAddress" className="block text-sm font-medium text-slate-300 mb-2">Address</label>
+                <textarea id="supAddress" name="supAddress" autoComplete="street-address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500" rows="2" placeholder="Address" />
               </div>
               
               <div className="flex justify-end gap-3 pt-4">
@@ -536,8 +540,8 @@ export default function Suppliers() {
                 </div>
                 <div className="text-right">
                   <p className="text-slate-400 text-sm">Balance Due</p>
-                  <p className="text-2xl font-bold text-yellow-400">{business.currency} {(selectedSupplier.balance || 0).toFixed(2)}</p>
-                  {selectedSupplier.advanceBalance > 0 && <p className="text-emerald-400 text-sm">Advance: {business.currency} {selectedSupplier.advanceBalance.toFixed(2)}</p>}
+                  <p className="text-2xl font-bold text-yellow-400">{business.currency || 'PKR'} {(selectedSupplier.balance || 0).toFixed(2)}</p>
+                  {(selectedSupplier.advanceBalance || 0) > 0 && <p className="text-emerald-400 text-sm">Advance: {business.currency || 'PKR'} {(selectedSupplier.advanceBalance || 0).toFixed(2)}</p>}
                 </div>
               </div>
             </div>
@@ -569,18 +573,18 @@ export default function Suppliers() {
                     <div className="bg-slate-900/50 p-4 rounded-lg">
                       <h4 className="text-white font-medium mb-3">Account Summary</h4>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between"><span className="text-slate-400">Total Purchase:</span><span className="text-cyan-400">{business.currency} {totalPurchasesAmount.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400">{business.currency} {totalPaidToSupplier.toFixed(2)}</span></div>
-                        {totalPurchaseReturns > 0 && <div className="flex justify-between"><span className="text-slate-400">Purchase Returns:</span><span className="text-orange-400">- {business.currency} {totalPurchaseReturns.toFixed(2)}</span></div>}
+                        <div className="flex justify-between"><span className="text-slate-400">Total Purchase:</span><span className="text-cyan-400">{business.currency || 'PKR'} {totalPurchasesAmount.toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400">{business.currency || 'PKR'} {totalPaidToSupplier.toFixed(2)}</span></div>
+                        {totalPurchaseReturns > 0 && <div className="flex justify-between"><span className="text-slate-400">Purchase Returns:</span><span className="text-orange-400">- {business.currency || 'PKR'} {totalPurchaseReturns.toFixed(2)}</span></div>}
                         <hr className="border-slate-700 my-2" />
-                        <div className="flex justify-between font-medium"><span className="text-slate-300">Balance Due:</span><span className="text-yellow-400">{business.currency} {(selectedSupplier.balance || 0).toFixed(2)}</span></div>
+                        <div className="flex justify-between font-medium"><span className="text-slate-300">Balance Due:</span><span className="text-yellow-400">{business.currency || 'PKR'} {(selectedSupplier.balance || 0).toFixed(2)}</span></div>
                       </div>
                     </div>
                     <div className="bg-slate-900/50 p-4 rounded-lg">
                       <h4 className="text-white font-medium mb-3">Overall Summary</h4>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between"><span className="text-slate-400">Opening Balance:</span><span className="text-white">{business.currency} {(selectedSupplier.openingBalance || 0).toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Advance Balance:</span><span className="text-emerald-400">{business.currency} {(selectedSupplier.advanceBalance || 0).toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Opening Balance:</span><span className="text-white">{business.currency || 'PKR'} {(selectedSupplier.openingBalance || 0).toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Advance Balance:</span><span className="text-emerald-400">{business.currency || 'PKR'} {(selectedSupplier.advanceBalance || 0).toFixed(2)}</span></div>
                         <div className="flex justify-between"><span className="text-slate-400">Total Purchases:</span><span className="text-white">{supplierPurchases.length}</span></div>
                         <div className="flex justify-between"><span className="text-slate-400">Total Returns:</span><span className="text-orange-400">{supplierPurchaseReturns.length}</span></div>
                       </div>
@@ -617,10 +621,10 @@ export default function Suppliers() {
                               <td className="px-4 py-3 text-white">{new Date(purchase.date || purchase.createdAt).toLocaleDateString()}</td>
                               <td className="px-4 py-3 text-cyan-400">{purchase.purchaseNo || '-'}</td>
                               <td className="px-4 py-3"><span className={`px-2 py-1 rounded-full text-xs ${paymentDue <= 0 ? 'bg-emerald-500/20 text-emerald-400' : paymentDue < (purchase.total || 0) ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>{paymentDue <= 0 ? 'paid' : paymentDue < (purchase.total || 0) ? 'partial' : 'due'}</span></td>
-                              <td className="px-4 py-3 text-white">{business.currency} {(purchase.total || 0).toFixed(2)}</td>
-                              <td className="px-4 py-3 text-emerald-400">{business.currency} {actualPaid.toFixed(2)}</td>
-                              <td className="px-4 py-3 text-orange-400">{purchaseReturnsAmount > 0 ? `- ${business.currency} ${purchaseReturnsAmount.toFixed(2)}` : '-'}</td>
-                              <td className="px-4 py-3 text-yellow-400">{business.currency} {paymentDue.toFixed(2)}</td>
+                              <td className="px-4 py-3 text-white">{business.currency || 'PKR'} {(purchase.total || 0).toFixed(2)}</td>
+                              <td className="px-4 py-3 text-emerald-400">{business.currency || 'PKR'} {actualPaid.toFixed(2)}</td>
+                              <td className="px-4 py-3 text-orange-400">{purchaseReturnsAmount > 0 ? `- ${business.currency || 'PKR'} ${purchaseReturnsAmount.toFixed(2)}` : '-'}</td>
+                              <td className="px-4 py-3 text-yellow-400">{business.currency || 'PKR'} {paymentDue.toFixed(2)}</td>
                             </tr>
                           )
                         })
@@ -630,10 +634,10 @@ export default function Suppliers() {
                   {supplierPurchases.length > 0 && (
                     <div className="mt-4 p-4 bg-slate-900/50 rounded-lg">
                       <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div className="flex justify-between"><span className="text-slate-400">Total Purchases:</span><span className="text-cyan-400 font-medium">{business.currency} {totalPurchasesAmount.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400 font-medium">{business.currency} {totalPaidToSupplier.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Total Returns:</span><span className="text-orange-400 font-medium">- {business.currency} {totalPurchaseReturns.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Balance Due:</span><span className="text-yellow-400 font-medium">{business.currency} {(selectedSupplier.balance || 0).toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Total Purchases:</span><span className="text-cyan-400 font-medium">{business.currency || 'PKR'} {totalPurchasesAmount.toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400 font-medium">{business.currency || 'PKR'} {totalPaidToSupplier.toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Total Returns:</span><span className="text-orange-400 font-medium">- {business.currency || 'PKR'} {totalPurchaseReturns.toFixed(2)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Balance Due:</span><span className="text-yellow-400 font-medium">{business.currency || 'PKR'} {(selectedSupplier.balance || 0).toFixed(2)}</span></div>
                       </div>
                     </div>
                   )}
@@ -659,14 +663,14 @@ export default function Suppliers() {
                         <tr><td colSpan="6" className="text-center py-8 text-slate-500">No purchase returns found</td></tr>
                       ) : (
                         supplierPurchaseReturns.map(pr => {
-                          const relatedPurchase = pr.purchaseId ? state.purchases.find(p => p.id === pr.purchaseId) : null
+                          const relatedPurchase = pr.purchaseId ? purchases.find(p => p.id === pr.purchaseId) : null
                           return (
                             <tr key={pr.id} className="border-t border-slate-700/50">
                               <td className="px-4 py-3 text-white">{new Date(pr.createdAt || pr.date).toLocaleDateString()}</td>
                               <td className="px-4 py-3 text-orange-400 font-medium">{pr.returnNo}</td>
                               <td className="px-4 py-3 text-cyan-400">{relatedPurchase?.purchaseNo || '-'}</td>
                               <td className="px-4 py-3 text-slate-300">{(pr.items || []).length} items</td>
-                              <td className="px-4 py-3 text-orange-400">{business.currency} {(pr.total || 0).toFixed(2)}</td>
+                              <td className="px-4 py-3 text-orange-400">{business.currency || 'PKR'} {(pr.total || 0).toFixed(2)}</td>
                               <td className="px-4 py-3"><span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs">{pr.status || 'completed'}</span></td>
                             </tr>
                           )
@@ -676,7 +680,7 @@ export default function Suppliers() {
                   </table>
                   {supplierPurchaseReturns.length > 0 && (
                     <div className="mt-4 p-4 bg-slate-900/50 rounded-lg">
-                      <div className="flex justify-between text-sm"><span className="text-slate-400">Total Purchase Returns:</span><span className="text-orange-400 font-medium">{business.currency} {totalPurchaseReturns.toFixed(2)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-slate-400">Total Purchase Returns:</span><span className="text-orange-400 font-medium">{business.currency || 'PKR'} {totalPurchaseReturns.toFixed(2)}</span></div>
                     </div>
                   )}
                 </div>
@@ -706,7 +710,7 @@ export default function Suppliers() {
                               <td className="px-4 py-3 text-white font-medium">{product.name}</td>
                               <td className="px-4 py-3 text-slate-300">{product.sku || '-'}</td>
                               <td className="px-4 py-3 text-cyan-400">{product.totalQuantity}</td>
-                              <td className="px-4 py-3 text-emerald-400">{business.currency} {product.totalValue.toFixed(2)}</td>
+                              <td className="px-4 py-3 text-emerald-400">{business.currency || 'PKR'} {product.totalValue.toFixed(2)}</td>
                               <td className="px-4 py-3"><span className={`px-2 py-1 rounded-full text-xs ${product.currentStock <= 0 ? 'bg-red-500/20 text-red-400' : product.currentStock < 10 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-emerald-500/20 text-emerald-400'}`}>{product.currentStock}</span></td>
                               <td className="px-4 py-3 text-slate-300">{product.purchases.length}</td>
                             </tr>
@@ -717,7 +721,7 @@ export default function Suppliers() {
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div className="flex justify-between"><span className="text-slate-400">Total Products:</span><span className="text-white font-medium">{supplierProducts.length}</span></div>
                           <div className="flex justify-between"><span className="text-slate-400">Total Qty Purchased:</span><span className="text-cyan-400 font-medium">{supplierProducts.reduce((sum, p) => sum + p.totalQuantity, 0)}</span></div>
-                          <div className="flex justify-between"><span className="text-slate-400">Total Purchase Value:</span><span className="text-emerald-400 font-medium">{business.currency} {supplierProducts.reduce((sum, p) => sum + p.totalValue, 0).toFixed(2)}</span></div>
+                          <div className="flex justify-between"><span className="text-slate-400">Total Purchase Value:</span><span className="text-emerald-400 font-medium">{business.currency || 'PKR'} {supplierProducts.reduce((sum, p) => sum + p.totalValue, 0).toFixed(2)}</span></div>
                         </div>
                       </div>
                     </>
@@ -746,13 +750,13 @@ export default function Suppliers() {
                         <tr><td colSpan="5" className="text-center py-8 text-slate-500">No payments found</td></tr>
                       ) : (
                         supplierPayments.map(payment => {
-                          const relatedPurchase = payment.purchaseId ? state.purchases.find(p => p.id === payment.purchaseId) : null
+                          const relatedPurchase = payment.purchaseId ? purchases.find(p => p.id === payment.purchaseId) : null
                           return (
                             <tr key={payment.id} className="border-t border-slate-700/50">
                               <td className="px-4 py-3 text-white">{new Date(payment.date).toLocaleString()}</td>
                               <td className="px-4 py-3 text-cyan-400">{relatedPurchase?.purchaseNo || '-'}</td>
                               <td className="px-4 py-3 text-slate-300">{payment.method}</td>
-                              <td className="px-4 py-3 text-emerald-400">{business.currency} {(payment.amount || 0).toFixed(2)}</td>
+                              <td className="px-4 py-3 text-emerald-400">{business.currency || 'PKR'} {(payment.amount || 0).toFixed(2)}</td>
                               <td className="px-4 py-3 text-slate-400">{payment.note || '-'}</td>
                             </tr>
                           )
@@ -762,7 +766,7 @@ export default function Suppliers() {
                   </table>
                   {supplierPayments.length > 0 && (
                     <div className="mt-4 p-4 bg-slate-900/50 rounded-lg">
-                      <div className="flex justify-between text-sm"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400 font-medium">{business.currency} {totalPaidToSupplier.toFixed(2)}</span></div>
+                      <div className="flex justify-between text-sm"><span className="text-slate-400">Total Paid:</span><span className="text-emerald-400 font-medium">{business.currency || 'PKR'} {totalPaidToSupplier.toFixed(2)}</span></div>
                     </div>
                   )}
                 </div>
@@ -806,10 +810,10 @@ export default function Suppliers() {
                   </div>
                   <div id="addContactFormSupplier" className="hidden bg-slate-900/50 p-4 rounded-lg">
                     <div className="grid grid-cols-5 gap-4">
-                      <input type="text" placeholder="Username" value={contactPersonForm.username} onChange={(e) => setContactPersonForm({ ...contactPersonForm, username: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
-                      <input type="text" placeholder="Name *" value={contactPersonForm.name} onChange={(e) => setContactPersonForm({ ...contactPersonForm, name: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
-                      <input type="email" placeholder="Email" value={contactPersonForm.email} onChange={(e) => setContactPersonForm({ ...contactPersonForm, email: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
-                      <input type="text" placeholder="Department" value={contactPersonForm.department} onChange={(e) => setContactPersonForm({ ...contactPersonForm, department: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
+                      <input id="cpUsername" name="cpUsername" autoComplete="off" aria-label="Contact person username" type="text" placeholder="Username" value={contactPersonForm.username} onChange={(e) => setContactPersonForm({ ...contactPersonForm, username: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
+                      <input id="cpName" name="cpName" autoComplete="off" aria-label="Contact person name" type="text" placeholder="Name *" value={contactPersonForm.name} onChange={(e) => setContactPersonForm({ ...contactPersonForm, name: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
+                      <input id="cpEmail" name="cpEmail" autoComplete="off" aria-label="Contact person email" type="email" placeholder="Email" value={contactPersonForm.email} onChange={(e) => setContactPersonForm({ ...contactPersonForm, email: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
+                      <input id="cpDepartment" name="cpDepartment" autoComplete="off" aria-label="Contact person department" type="text" placeholder="Department" value={contactPersonForm.department} onChange={(e) => setContactPersonForm({ ...contactPersonForm, department: e.target.value })} className="px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm" />
                       <button onClick={handleAddContactPerson} className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition-colors">Add</button>
                     </div>
                   </div>
@@ -831,7 +835,7 @@ export default function Suppliers() {
                         (selectedSupplier.contactPersons || []).map(person => (
                           <tr key={person.id} className="border-t border-slate-700/50">
                             <td className="px-4 py-3">
-                              <button onClick={() => { if (confirm('Delete this contact person?')) { dispatch({ type: 'DELETE_SUPPLIER_CONTACT_PERSON', payload: { supplierId: selectedSupplier.id, personId: person.id } }); setSelectedSupplier({ ...selectedSupplier, contactPersons: selectedSupplier.contactPersons.filter(p => p.id !== person.id) }) } }} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs hover:bg-red-500/30">Delete</button>
+                              <button onClick={() => { if (confirm('Delete this contact person?')) { dispatch({ type: 'DELETE_SUPPLIER_CONTACT_PERSON', payload: { supplierId: selectedSupplier.id, personId: person.id } }); setSelectedSupplier({ ...selectedSupplier, contactPersons: (selectedSupplier.contactPersons || []).filter(p => p.id !== person.id) }) } }} className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs hover:bg-red-500/30">Delete</button>
                             </td>
                             <td className="px-4 py-3 text-white">{person.username || '-'}</td>
                             <td className="px-4 py-3 text-white">{person.name}</td>

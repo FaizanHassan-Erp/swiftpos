@@ -281,6 +281,10 @@ export default function Users() {
           </div>
           <div className="relative">
             <input
+              id="usrSearch"
+              name="usrSearch"
+              autoComplete="off"
+              aria-label="Search users"
               type="text"
               placeholder="Search users..."
               value={searchTerm}
@@ -422,8 +426,11 @@ export default function Users() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Full Name *</label>
+                  <label htmlFor="usrName" className="block text-sm font-medium text-slate-300 mb-2">Full Name *</label>
                   <input
+                    id="usrName"
+                    name="usrName"
+                    autoComplete="name"
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -433,8 +440,11 @@ export default function Users() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                  <label htmlFor="usrUsername" className="block text-sm font-medium text-slate-300 mb-2">Username</label>
                   <input
+                    id="usrUsername"
+                    name="usrUsername"
+                    autoComplete="username"
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -445,8 +455,11 @@ export default function Users() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Email *</label>
+                <label htmlFor="usrEmail" className="block text-sm font-medium text-slate-300 mb-2">Email *</label>
                 <input
+                  id="usrEmail"
+                  name="usrEmail"
+                  autoComplete="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -461,10 +474,13 @@ export default function Users() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="usrPassword" className="block text-sm font-medium text-slate-300 mb-2">
                   Password {editingUser ? '(Cannot change)' : '*'}
                 </label>
                 <input
+                  id="usrPassword"
+                  name="usrPassword"
+                  autoComplete="new-password"
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -480,8 +496,10 @@ export default function Users() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Role *</label>
+                  <label htmlFor="usrRole" className="block text-sm font-medium text-slate-300 mb-2">Role *</label>
                   <select
+                    id="usrRole"
+                    name="usrRole"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -494,8 +512,10 @@ export default function Users() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                  <label htmlFor="usrStatus" className="block text-sm font-medium text-slate-300 mb-2">Status</label>
                   <select
+                    id="usrStatus"
+                    name="usrStatus"
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

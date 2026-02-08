@@ -195,15 +195,19 @@ export default function BarcodeSettings() {
   }
 
   // Toggle component
-  const Toggle = ({ enabled, onChange, label }) => (
-    <label className="flex items-center gap-3 cursor-pointer">
-      <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
-        <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
-      </div>
-      <span className="text-slate-300">{label}</span>
-      <input type="checkbox" className="sr-only" checked={enabled} onChange={onChange} />
-    </label>
-  )
+  const Toggle = ({ enabled, onChange, label, id, name }) => {
+    const fieldId = id || (label ? `bcs-toggle-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}` : undefined)
+    const fieldName = name || fieldId
+    return (
+      <label className="flex items-center gap-3 cursor-pointer">
+        <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
+          <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
+        </div>
+        <span className="text-slate-300">{label}</span>
+        <input type="checkbox" id={fieldId} name={fieldName} className="sr-only" checked={enabled} onChange={onChange} />
+      </label>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -258,6 +262,10 @@ export default function BarcodeSettings() {
           <h2 className="text-lg font-semibold text-white">All Barcode Sticker Settings</h2>
           <div className="relative">
             <input
+              id="bcsSearch"
+              name="bcsSearch"
+              aria-label="Search barcode settings"
+              autoComplete="off"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -405,10 +413,13 @@ export default function BarcodeSettings() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                        <label htmlFor="bcsName" className="block text-sm font-medium text-slate-300 mb-2">
                           Name <span className="text-red-400">*</span>
                         </label>
                         <input
+                          id="bcsName"
+                          name="bcsName"
+                          autoComplete="off"
                           type="text"
                           value={formData.name}
                           onChange={(e) => handleChange('name', e.target.value)}
@@ -418,8 +429,11 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                        <label htmlFor="bcsDescription" className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                         <input
+                          id="bcsDescription"
+                          name="bcsDescription"
+                          autoComplete="off"
                           type="text"
                           value={formData.description}
                           onChange={(e) => handleChange('description', e.target.value)}
@@ -440,8 +454,10 @@ export default function BarcodeSettings() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Preset</label>
+                        <label htmlFor="bcsPaperPreset" className="block text-sm font-medium text-slate-300 mb-2">Preset</label>
                         <select
+                          id="bcsPaperPreset"
+                          name="bcsPaperPreset"
                           onChange={(e) => handlePaperSizeChange(e.target.value)}
                           className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
                         >
@@ -453,8 +469,10 @@ export default function BarcodeSettings() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Width</label>
+                        <label htmlFor="bcsPaperWidth" className="block text-sm font-medium text-slate-300 mb-2">Width</label>
                         <input
+                          id="bcsPaperWidth"
+                          name="bcsPaperWidth"
                           type="number"
                           value={formData.paperWidth}
                           onChange={(e) => handleChange('paperWidth', parseFloat(e.target.value) || 0)}
@@ -462,8 +480,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Height</label>
+                        <label htmlFor="bcsPaperHeight" className="block text-sm font-medium text-slate-300 mb-2">Height</label>
                         <input
+                          id="bcsPaperHeight"
+                          name="bcsPaperHeight"
                           type="number"
                           value={formData.paperHeight}
                           onChange={(e) => handleChange('paperHeight', parseFloat(e.target.value) || 0)}
@@ -483,8 +503,10 @@ export default function BarcodeSettings() {
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Width</label>
+                        <label htmlFor="bcsStickerWidth" className="block text-sm font-medium text-slate-300 mb-2">Width</label>
                         <input
+                          id="bcsStickerWidth"
+                          name="bcsStickerWidth"
                           type="number"
                           value={formData.stickerWidth}
                           onChange={(e) => handleChange('stickerWidth', parseFloat(e.target.value) || 0)}
@@ -492,8 +514,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Height</label>
+                        <label htmlFor="bcsStickerHeight" className="block text-sm font-medium text-slate-300 mb-2">Height</label>
                         <input
+                          id="bcsStickerHeight"
+                          name="bcsStickerHeight"
                           type="number"
                           value={formData.stickerHeight}
                           onChange={(e) => handleChange('stickerHeight', parseFloat(e.target.value) || 0)}
@@ -501,8 +525,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Stickers/Row</label>
+                        <label htmlFor="bcsStickersPerRow" className="block text-sm font-medium text-slate-300 mb-2">Stickers/Row</label>
                         <input
+                          id="bcsStickersPerRow"
+                          name="bcsStickersPerRow"
                           type="number"
                           value={formData.stickersInOneRow}
                           onChange={(e) => handleChange('stickersInOneRow', parseInt(e.target.value) || 1)}
@@ -511,8 +537,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Rows/Page</label>
+                        <label htmlFor="bcsRowsPerPage" className="block text-sm font-medium text-slate-300 mb-2">Rows/Page</label>
                         <input
+                          id="bcsRowsPerPage"
+                          name="bcsRowsPerPage"
                           type="number"
                           value={formData.rowsPerPage}
                           onChange={(e) => handleChange('rowsPerPage', parseInt(e.target.value) || 1)}
@@ -533,8 +561,10 @@ export default function BarcodeSettings() {
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Top Margin</label>
+                        <label htmlFor="bcsTopMargin" className="block text-sm font-medium text-slate-300 mb-2">Top Margin</label>
                         <input
+                          id="bcsTopMargin"
+                          name="bcsTopMargin"
                           type="number"
                           value={formData.topMargin}
                           onChange={(e) => handleChange('topMargin', parseFloat(e.target.value) || 0)}
@@ -542,8 +572,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Left Margin</label>
+                        <label htmlFor="bcsLeftMargin" className="block text-sm font-medium text-slate-300 mb-2">Left Margin</label>
                         <input
+                          id="bcsLeftMargin"
+                          name="bcsLeftMargin"
                           type="number"
                           value={formData.leftMargin}
                           onChange={(e) => handleChange('leftMargin', parseFloat(e.target.value) || 0)}
@@ -551,8 +583,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Column Gap</label>
+                        <label htmlFor="bcsColumnGap" className="block text-sm font-medium text-slate-300 mb-2">Column Gap</label>
                         <input
+                          id="bcsColumnGap"
+                          name="bcsColumnGap"
                           type="number"
                           value={formData.paperStickerGapWidth}
                           onChange={(e) => handleChange('paperStickerGapWidth', parseFloat(e.target.value) || 0)}
@@ -560,8 +594,10 @@ export default function BarcodeSettings() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Row Gap</label>
+                        <label htmlFor="bcsRowGap" className="block text-sm font-medium text-slate-300 mb-2">Row Gap</label>
                         <input
+                          id="bcsRowGap"
+                          name="bcsRowGap"
                           type="number"
                           value={formData.rowDistance}
                           onChange={(e) => handleChange('rowDistance', parseFloat(e.target.value) || 0)}
@@ -580,8 +616,10 @@ export default function BarcodeSettings() {
                       Barcode Settings
                     </h3>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-slate-300 mb-2">Barcode Type</label>
+                      <label htmlFor="bcsBarcodeType" className="block text-sm font-medium text-slate-300 mb-2">Barcode Type</label>
                       <select
+                        id="bcsBarcodeType"
+                        name="bcsBarcodeType"
                         value={formData.barcodeType}
                         onChange={(e) => handleChange('barcodeType', e.target.value)}
                         className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

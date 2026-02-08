@@ -88,7 +88,7 @@ export default function Warranties() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="warPageSize" name="warPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -97,6 +97,10 @@ export default function Warranties() {
           </div>
           <div className="relative">
             <input
+              id="warSearch"
+              name="warSearch"
+              autoComplete="off"
+              aria-label="Search warranties"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -176,8 +180,11 @@ export default function Warranties() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
+                <label htmlFor="warName" className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
                 <input
+                  id="warName"
+                  name="warName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -188,8 +195,10 @@ export default function Warranties() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                <label htmlFor="warDescription" className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                 <textarea
+                  id="warDescription"
+                  name="warDescription"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -199,9 +208,12 @@ export default function Warranties() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Duration *</label>
+                <label htmlFor="warDuration" className="block text-sm font-medium text-slate-300 mb-2">Duration *</label>
                 <div className="flex gap-2">
                   <input
+                    id="warDuration"
+                    name="warDuration"
+                    autoComplete="off"
                     type="number"
                     min="0"
                     value={formData.duration}
@@ -210,6 +222,9 @@ export default function Warranties() {
                     placeholder="Duration"
                   />
                   <select
+                    id="warDurationType"
+                    name="warDurationType"
+                    aria-label="Duration type"
                     value={formData.durationType}
                     onChange={(e) => setFormData({ ...formData, durationType: e.target.value })}
                     className="w-32 px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

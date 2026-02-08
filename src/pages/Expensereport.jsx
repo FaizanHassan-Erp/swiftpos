@@ -305,8 +305,8 @@ export default function ExpenseReport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 print:hidden">
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Period</label>
-            <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="erPeriod" className="block text-slate-400 text-sm mb-1">Period</label>
+            <select id="erPeriod" name="erPeriod" value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -324,19 +324,19 @@ export default function ExpenseReport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Start Date</label>
-                <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="erStartDate" className="block text-slate-400 text-sm mb-1">Start Date</label>
+                <input id="erStartDate" name="erStartDate" type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">End Date</label>
-                <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="erEndDate" className="block text-slate-400 text-sm mb-1">End Date</label>
+                <input id="erEndDate" name="erEndDate" type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Category</label>
-            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
+            <label htmlFor="erCategory" className="block text-slate-400 text-sm mb-1">Category</label>
+            <select id="erCategory" name="erCategory" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[150px]">
               <option value="all">All Categories</option>
               {expenseCategories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -345,8 +345,8 @@ export default function ExpenseReport() {
           </div>
 
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Status</label>
-            <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
+            <label htmlFor="erStatus" className="block text-slate-400 text-sm mb-1">Status</label>
+            <select id="erStatus" name="erStatus" value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[120px]">
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
               <option value="partial">Partial</option>
@@ -355,9 +355,9 @@ export default function ExpenseReport() {
           </div>
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-slate-400 text-sm mb-1">Search</label>
+            <label htmlFor="erSearch" className="block text-slate-400 text-sm mb-1">Search</label>
             <div className="relative">
-              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by reference, note, category..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+              <input id="erSearch" name="erSearch" autoComplete="off" type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by reference, note, category..." className="w-full bg-slate-900 text-white px-4 py-2 pl-10 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
           </div>

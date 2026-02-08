@@ -5,7 +5,7 @@ import { useApp } from '../Context/AppContext'
 export default function Addsale() {
   const navigate = useNavigate()
   const { state, dispatch } = useApp()
-  const { products, customers, salesAgents, paymentAccounts = [], business } = state
+  const { products = [], customers = [], salesAgents = [], paymentAccounts = [], business = {} } = state
   
   const [formData, setFormData] = useState({
     customerId: customers[0]?.id || '',
@@ -30,14 +30,12 @@ export default function Addsale() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showProductDropdown, setShowProductDropdown] = useState(false)
 
-  // Filter products for search
   const filteredProducts = products.filter(p => 
     (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
      p.sku?.toLowerCase().includes(searchTerm.toLowerCase())) &&
     p.currentStock > 0
   )
 
-  // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0)
   const discountAmount = discountType === 'percent' ? (subtotal * discount / 100) : discount
   const taxAmount = (subtotal - discountAmount) * orderTax / 100
@@ -80,7 +78,6 @@ export default function Addsale() {
       return
     }
     
-    // Recalculate subtotal
     const item = newItems[index]
     const priceAfterDiscount = item.unitPrice * (1 - item.discount / 100)
     const priceWithTax = priceAfterDiscount * (1 + item.tax / 100)
@@ -142,8 +139,6 @@ export default function Addsale() {
   }
 
   const selectedCustomer = customers.find(c => c.id === parseInt(formData.customerId))
-
-  // Filter active payment accounts only
   const activeAccounts = paymentAccounts.filter(acc => acc.status !== 'closed')
 
   return (
@@ -167,8 +162,10 @@ export default function Addsale() {
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Customer *</label>
+              <label htmlFor="asCustomerId" className="block text-sm font-medium text-slate-300 mb-2">Customer *</label>
               <select
+                id="asCustomerId"
+                name="asCustomerId"
                 value={formData.customerId}
                 onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -184,8 +181,10 @@ export default function Addsale() {
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
+              <label htmlFor="asDate" className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
               <input
+                id="asDate"
+                name="asDate"
                 type="datetime-local"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -194,8 +193,10 @@ export default function Addsale() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Sales Agent</label>
+              <label htmlFor="asSalesAgentId" className="block text-sm font-medium text-slate-300 mb-2">Sales Agent</label>
               <select
+                id="asSalesAgentId"
+                name="asSalesAgentId"
                 value={formData.salesAgentId}
                 onChange={(e) => setFormData({ ...formData, salesAgentId: e.target.value })}
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -207,8 +208,10 @@ export default function Addsale() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Location</label>
+              <label htmlFor="asLocation" className="block text-sm font-medium text-slate-300 mb-2">Location</label>
               <input
+                id="asLocation"
+                name="asLocation"
                 type="text"
                 value={business.name}
                 disabled
@@ -230,6 +233,10 @@ export default function Addsale() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
+                  id="asProductSearch"
+                  name="asProductSearch"
+                  autoComplete="off"
+                  aria-label="Search products by name, SKU or barcode"
                   type="text"
                   placeholder="Enter Product name / SKU / Scan bar code"
                   value={searchTerm}
@@ -307,6 +314,7 @@ export default function Addsale() {
                             className="w-7 h-7 bg-slate-700 rounded text-white hover:bg-slate-600"
                           >-</button>
                           <input
+                            aria-label={`Quantity for ${item.name}`}
                             type="number"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, 'quantity', parseInt(e.target.value) || 1)}
@@ -322,6 +330,7 @@ export default function Addsale() {
                       </td>
                       <td className="px-4 py-2">
                         <input
+                          aria-label={`Unit price for ${item.name}`}
                           type="number"
                           value={item.unitPrice}
                           onChange={(e) => updateItem(index, 'unitPrice', parseFloat(e.target.value) || 0)}
@@ -330,6 +339,7 @@ export default function Addsale() {
                       </td>
                       <td className="px-4 py-2">
                         <input
+                          aria-label={`Discount percent for ${item.name}`}
                           type="number"
                           value={item.discount}
                           onChange={(e) => updateItem(index, 'discount', parseFloat(e.target.value) || 0)}
@@ -340,6 +350,7 @@ export default function Addsale() {
                       </td>
                       <td className="px-4 py-2">
                         <input
+                          aria-label={`Tax percent for ${item.name}`}
                           type="number"
                           value={item.tax}
                           onChange={(e) => updateItem(index, 'tax', parseFloat(e.target.value) || 0)}
@@ -385,8 +396,10 @@ export default function Addsale() {
 
         {/* Sale Note */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
-          <label className="block text-sm font-medium text-slate-300 mb-2">Sale Note</label>
+          <label htmlFor="asSaleNote" className="block text-sm font-medium text-slate-300 mb-2">Sale Note</label>
           <textarea
+            id="asSaleNote"
+            name="asSaleNote"
             value={formData.saleNote}
             onChange={(e) => setFormData({ ...formData, saleNote: e.target.value })}
             className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -400,8 +413,10 @@ export default function Addsale() {
           <h3 className="text-white font-medium mb-4">Shipping Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Shipping Details</label>
+              <label htmlFor="asShippingDetails" className="block text-sm font-medium text-slate-300 mb-2">Shipping Details</label>
               <textarea
+                id="asShippingDetails"
+                name="asShippingDetails"
                 value={formData.shippingDetails}
                 onChange={(e) => setFormData({ ...formData, shippingDetails: e.target.value })}
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -409,8 +424,10 @@ export default function Addsale() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Shipping Address</label>
+              <label htmlFor="asShippingAddress" className="block text-sm font-medium text-slate-300 mb-2">Shipping Address</label>
               <textarea
+                id="asShippingAddress"
+                name="asShippingAddress"
                 value={formData.shippingAddress}
                 onChange={(e) => setFormData({ ...formData, shippingAddress: e.target.value })}
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -418,10 +435,13 @@ export default function Addsale() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Shipping Charges</label>
+              <label htmlFor="asShippingCharges" className="block text-sm font-medium text-slate-300 mb-2">Shipping Charges</label>
               <div className="flex items-center gap-2">
                 <span className="text-slate-400">{business.currency}</span>
                 <input
+                  id="asShippingCharges"
+                  name="asShippingCharges"
+                  autoComplete="off"
                   type="number"
                   value={formData.shippingCharges}
                   onChange={(e) => setFormData({ ...formData, shippingCharges: e.target.value })}
@@ -431,8 +451,10 @@ export default function Addsale() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Shipping Status</label>
+              <label htmlFor="asShippingStatus" className="block text-sm font-medium text-slate-300 mb-2">Shipping Status</label>
               <select
+                id="asShippingStatus"
+                name="asShippingStatus"
                 value={formData.shippingStatus}
                 onChange={(e) => setFormData({ ...formData, shippingStatus: e.target.value })}
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -446,8 +468,11 @@ export default function Addsale() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Delivered To</label>
+              <label htmlFor="asDeliveredTo" className="block text-sm font-medium text-slate-300 mb-2">Delivered To</label>
               <input
+                id="asDeliveredTo"
+                name="asDeliveredTo"
+                autoComplete="off"
                 type="text"
                 value={formData.deliveredTo}
                 onChange={(e) => setFormData({ ...formData, deliveredTo: e.target.value })}
@@ -455,8 +480,11 @@ export default function Addsale() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Delivery Person</label>
+              <label htmlFor="asDeliveryPerson" className="block text-sm font-medium text-slate-300 mb-2">Delivery Person</label>
               <input
+                id="asDeliveryPerson"
+                name="asDeliveryPerson"
+                autoComplete="off"
                 type="text"
                 value={formData.deliveryPerson}
                 onChange={(e) => setFormData({ ...formData, deliveryPerson: e.target.value })}
@@ -473,9 +501,12 @@ export default function Addsale() {
             <h3 className="text-white font-medium mb-4">Discount & Tax</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Discount</label>
+                <label htmlFor="asDiscount" className="block text-sm font-medium text-slate-300 mb-2">Discount</label>
                 <div className="flex gap-2">
                   <input
+                    id="asDiscount"
+                    name="asDiscount"
+                    autoComplete="off"
                     type="number"
                     value={discount}
                     onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
@@ -483,6 +514,9 @@ export default function Addsale() {
                     min="0"
                   />
                   <select
+                    id="asDiscountType"
+                    name="asDiscountType"
+                    aria-label="Discount type"
                     value={discountType}
                     onChange={(e) => setDiscountType(e.target.value)}
                     className="px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -493,8 +527,11 @@ export default function Addsale() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Order Tax (%)</label>
+                <label htmlFor="asOrderTax" className="block text-sm font-medium text-slate-300 mb-2">Order Tax (%)</label>
                 <input
+                  id="asOrderTax"
+                  name="asOrderTax"
+                  autoComplete="off"
                   type="number"
                   value={orderTax}
                   onChange={(e) => setOrderTax(parseFloat(e.target.value) || 0)}
@@ -510,8 +547,10 @@ export default function Addsale() {
             <h3 className="text-white font-medium mb-4">Payment</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
+                <label htmlFor="asPaymentMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
                 <select
+                  id="asPaymentMethod"
+                  name="asPaymentMethod"
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -523,8 +562,11 @@ export default function Addsale() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
+                <label htmlFor="asAmountPaid" className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
                 <input
+                  id="asAmountPaid"
+                  name="asAmountPaid"
+                  autoComplete="off"
                   type="number"
                   value={formData.amountPaid}
                   onChange={(e) => setFormData({ ...formData, amountPaid: e.target.value })}
@@ -534,8 +576,10 @@ export default function Addsale() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
+                <label htmlFor="asPaymentAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
                 <select
+                  id="asPaymentAccountId"
+                  name="asPaymentAccountId"
                   value={formData.paymentAccountId}
                   onChange={(e) => setFormData({ ...formData, paymentAccountId: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"

@@ -272,8 +272,11 @@ export default function Registerreport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+            <label htmlFor="rrStartDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
             <input
+              id="rrStartDate"
+              name="rrStartDate"
+              autoComplete="off"
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
@@ -281,8 +284,11 @@ export default function Registerreport() {
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">End Date</label>
+            <label htmlFor="rrEndDate" className="block text-sm text-slate-400 mb-1">End Date</label>
             <input
+              id="rrEndDate"
+              name="rrEndDate"
+              autoComplete="off"
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
@@ -290,8 +296,10 @@ export default function Registerreport() {
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Status</label>
+            <label htmlFor="rrStatus" className="block text-sm text-slate-400 mb-1">Status</label>
             <select
+              id="rrStatus"
+              name="rrStatus"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -302,8 +310,10 @@ export default function Registerreport() {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Discrepancy</label>
+            <label htmlFor="rrDiscrepancy" className="block text-sm text-slate-400 mb-1">Discrepancy</label>
             <select
+              id="rrDiscrepancy"
+              name="rrDiscrepancy"
               value={discrepancyFilter}
               onChange={(e) => setDiscrepancyFilter(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -315,8 +325,11 @@ export default function Registerreport() {
             </select>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Search</label>
+            <label htmlFor="rrSearch" className="block text-sm text-slate-400 mb-1">Search</label>
             <input
+              id="rrSearch"
+              name="rrSearch"
+              autoComplete="off"
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

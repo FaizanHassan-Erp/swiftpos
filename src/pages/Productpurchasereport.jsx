@@ -361,8 +361,10 @@ export default function Productpurchasereport() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Date Range</label>
+            <label htmlFor="pprDateRange" className="block text-sm text-slate-400 mb-1">Date Range</label>
             <select
+              id="pprDateRange"
+              name="pprDateRange"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -382,8 +384,10 @@ export default function Productpurchasereport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+                <label htmlFor="pprStartDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
                 <input
+                  id="pprStartDate"
+                  name="pprStartDate"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -391,8 +395,10 @@ export default function Productpurchasereport() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">End Date</label>
+                <label htmlFor="pprEndDate" className="block text-sm text-slate-400 mb-1">End Date</label>
                 <input
+                  id="pprEndDate"
+                  name="pprEndDate"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -403,8 +409,10 @@ export default function Productpurchasereport() {
           )}
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Product</label>
+            <label htmlFor="pprProduct" className="block text-sm text-slate-400 mb-1">Product</label>
             <select
+              id="pprProduct"
+              name="pprProduct"
               value={filterProduct}
               onChange={(e) => setFilterProduct(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -417,8 +425,10 @@ export default function Productpurchasereport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Category</label>
+            <label htmlFor="pprCategory" className="block text-sm text-slate-400 mb-1">Category</label>
             <select
+              id="pprCategory"
+              name="pprCategory"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -431,8 +441,10 @@ export default function Productpurchasereport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Brand</label>
+            <label htmlFor="pprBrand" className="block text-sm text-slate-400 mb-1">Brand</label>
             <select
+              id="pprBrand"
+              name="pprBrand"
               value={filterBrand}
               onChange={(e) => setFilterBrand(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -445,8 +457,10 @@ export default function Productpurchasereport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Supplier</label>
+            <label htmlFor="pprSupplier" className="block text-sm text-slate-400 mb-1">Supplier</label>
             <select
+              id="pprSupplier"
+              name="pprSupplier"
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -466,6 +480,10 @@ export default function Productpurchasereport() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
+              id="pprSearch"
+              name="pprSearch"
+              autoComplete="off"
+              aria-label="Search product, supplier, purchase number"
               type="text"
               placeholder="Search product, supplier, purchase no..."
               value={searchTerm}

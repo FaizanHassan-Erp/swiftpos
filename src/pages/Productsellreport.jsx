@@ -366,8 +366,10 @@ export default function Productsellreport() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Date Range</label>
+            <label htmlFor="dateRange" className="block text-sm text-slate-400 mb-1">Date Range</label>
             <select
+              id="dateRange"
+              name="dateRange"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -387,8 +389,11 @@ export default function Productsellreport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+                <label htmlFor="startDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
                 <input
+                  id="startDate"
+                  name="startDate"
+                  autoComplete="off"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -396,8 +401,11 @@ export default function Productsellreport() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">End Date</label>
+                <label htmlFor="endDate" className="block text-sm text-slate-400 mb-1">End Date</label>
                 <input
+                  id="endDate"
+                  name="endDate"
+                  autoComplete="off"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -408,8 +416,10 @@ export default function Productsellreport() {
           )}
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Product</label>
+            <label htmlFor="filterProduct" className="block text-sm text-slate-400 mb-1">Product</label>
             <select
+              id="filterProduct"
+              name="filterProduct"
               value={filterProduct}
               onChange={(e) => setFilterProduct(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -422,8 +432,10 @@ export default function Productsellreport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Category</label>
+            <label htmlFor="filterCategory" className="block text-sm text-slate-400 mb-1">Category</label>
             <select
+              id="filterCategory"
+              name="filterCategory"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -436,8 +448,10 @@ export default function Productsellreport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Brand</label>
+            <label htmlFor="filterBrand" className="block text-sm text-slate-400 mb-1">Brand</label>
             <select
+              id="filterBrand"
+              name="filterBrand"
               value={filterBrand}
               onChange={(e) => setFilterBrand(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -450,8 +464,10 @@ export default function Productsellreport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Customer</label>
+            <label htmlFor="filterCustomer" className="block text-sm text-slate-400 mb-1">Customer</label>
             <select
+              id="filterCustomer"
+              name="filterCustomer"
               value={filterCustomer}
               onChange={(e) => setFilterCustomer(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -474,9 +490,12 @@ export default function Productsellreport() {
               type="text"
               placeholder="Search product, customer, invoice..."
               value={searchTerm}
+              id="sellReportSearch"
+              name="sellReportSearch"
+              autoComplete="off"
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm"
-            />
+            />  
           </div>
         </div>
       </div>

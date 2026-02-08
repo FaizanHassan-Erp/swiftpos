@@ -13,7 +13,6 @@ export default function StockAdjustment() {
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
 
-  // Add form state
   const [formData, setFormData] = useState({
     date: new Date().toISOString().slice(0, 16),
     adjustmentType: '',
@@ -24,7 +23,6 @@ export default function StockAdjustment() {
   const [productSearch, setProductSearch] = useState('')
   const [showProductDropdown, setShowProductDropdown] = useState(false)
 
-  // Filter adjustments
   const filteredAdjustments = (stockAdjustments || []).filter(adj => {
     const matchesSearch = adj.referenceNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          adj.reason?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -32,13 +30,11 @@ export default function StockAdjustment() {
     return matchesSearch && matchesType
   })
 
-  // Summary calculations
   const totalAdjustments = filteredAdjustments.length
   const totalNormal = filteredAdjustments.filter(a => a.adjustmentType === 'normal').length
   const totalAbnormal = filteredAdjustments.filter(a => a.adjustmentType === 'abnormal').length
   const totalLoss = filteredAdjustments.reduce((sum, a) => sum + ((a.totalAmount || 0) - (a.totalAmountRecovered || 0)), 0)
 
-  // Product helpers
   const getProduct = (id) => products.find(p => p.id === id) || { name: 'Unknown', sku: '-' }
   
   const filteredProducts = products.filter(p => 
@@ -46,7 +42,6 @@ export default function StockAdjustment() {
     p.sku?.toLowerCase().includes(productSearch.toLowerCase())
   )
 
-  // Adjustment types
   const adjustmentTypes = [
     { value: 'normal', label: 'Normal', description: 'Regular stock correction' },
     { value: 'abnormal', label: 'Abnormal', description: 'Damaged, expired, or theft' }
@@ -69,7 +64,6 @@ export default function StockAdjustment() {
   }
 
   function addProduct(product) {
-    // Check if product already added
     if (adjustmentItems.find(item => item.productId === product.id)) {
       setProductSearch('')
       setShowProductDropdown(false)
@@ -247,6 +241,9 @@ export default function StockAdjustment() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
         <div className="flex flex-wrap gap-4 items-center">
           <select
+            id="saFilterType"
+            name="saFilterType"
+            aria-label="Filter by adjustment type"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
             className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm"
@@ -258,6 +255,10 @@ export default function StockAdjustment() {
           <div className="flex-1"></div>
           <div className="relative">
             <input
+              id="saSearch"
+              name="saSearch"
+              autoComplete="off"
+              aria-label="Search stock adjustments"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -381,8 +382,10 @@ export default function StockAdjustment() {
               {/* Top Row */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Business Location *</label>
+                  <label htmlFor="saLocation" className="block text-sm font-medium text-slate-300 mb-2">Business Location *</label>
                   <input
+                    id="saLocation"
+                    name="saLocation"
                     type="text"
                     value={business.name}
                     readOnly
@@ -390,8 +393,10 @@ export default function StockAdjustment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Reference No</label>
+                  <label htmlFor="saReferenceNo" className="block text-sm font-medium text-slate-300 mb-2">Reference No</label>
                   <input
+                    id="saReferenceNo"
+                    name="saReferenceNo"
                     type="text"
                     placeholder="Auto generated"
                     readOnly
@@ -399,8 +404,10 @@ export default function StockAdjustment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
+                  <label htmlFor="saDate" className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
                   <input
+                    id="saDate"
+                    name="saDate"
                     type="datetime-local"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -408,8 +415,10 @@ export default function StockAdjustment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Adjustment Type *</label>
+                  <label htmlFor="saAdjustmentType" className="block text-sm font-medium text-slate-300 mb-2">Adjustment Type *</label>
                   <select
+                    id="saAdjustmentType"
+                    name="saAdjustmentType"
                     value={formData.adjustmentType}
                     onChange={(e) => setFormData({ ...formData, adjustmentType: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -444,6 +453,10 @@ export default function StockAdjustment() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     <input
+                      id="saProductSearch"
+                      name="saProductSearch"
+                      autoComplete="off"
+                      aria-label="Search products for stock adjustment"
                       type="text"
                       placeholder="Search products for stock adjustment"
                       value={productSearch}
@@ -456,7 +469,6 @@ export default function StockAdjustment() {
                     />
                   </div>
                   
-                  {/* Product Dropdown */}
                   {showProductDropdown && productSearch && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-20 max-h-60 overflow-y-auto">
                       {filteredProducts.length === 0 ? (
@@ -518,6 +530,7 @@ export default function StockAdjustment() {
                           <td className="px-4 py-3">
                             <div className="flex items-center justify-center gap-2">
                               <input
+                                aria-label={`Adjustment quantity for ${item.productName}`}
                                 type="number"
                                 value={item.quantity}
                                 onChange={(e) => updateItemQuantity(index, e.target.value)}
@@ -538,6 +551,7 @@ export default function StockAdjustment() {
                           </td>
                           <td className="px-4 py-3">
                             <input
+                              aria-label={`Unit price for ${item.productName}`}
                               type="number"
                               step="0.01"
                               value={item.unitPrice}
@@ -576,13 +590,16 @@ export default function StockAdjustment() {
               {/* Bottom Section */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="saAmountRecovered" className="block text-sm font-medium text-slate-300 mb-2">
                     Total Amount Recovered
                     <span className="ml-2 text-slate-500 text-xs" title="Amount recovered from damaged/expired goods">ℹ️</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{business.currency}</span>
                     <input
+                      id="saAmountRecovered"
+                      name="saAmountRecovered"
+                      autoComplete="off"
                       type="number"
                       step="0.01"
                       value={formData.totalAmountRecovered}
@@ -594,8 +611,10 @@ export default function StockAdjustment() {
                   <p className="text-slate-500 text-xs mt-1">Amount recovered from selling damaged items at discount or insurance claims</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Reason</label>
+                  <label htmlFor="saReason" className="block text-sm font-medium text-slate-300 mb-2">Reason</label>
                   <textarea
+                    id="saReason"
+                    name="saReason"
                     value={formData.reason}
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white resize-none"
@@ -643,7 +662,6 @@ export default function StockAdjustment() {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Info Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-slate-900/50 p-3 rounded-lg">
                   <p className="text-slate-400 text-sm">Date</p>
@@ -669,7 +687,6 @@ export default function StockAdjustment() {
                 </div>
               </div>
 
-              {/* Items */}
               <div>
                 <h3 className="text-white font-medium mb-3">Adjusted Products</h3>
                 <table className="w-full">
@@ -701,7 +718,6 @@ export default function StockAdjustment() {
                 </table>
               </div>
 
-              {/* Summary */}
               <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Total Amount:</span>
@@ -718,7 +734,6 @@ export default function StockAdjustment() {
                 </div>
               </div>
 
-              {/* Reason */}
               {selectedAdjustment.reason && (
                 <div className="bg-slate-900/50 rounded-lg p-4">
                   <p className="text-slate-400 text-sm mb-1">Reason</p>

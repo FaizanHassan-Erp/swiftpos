@@ -11,7 +11,6 @@ export default function Salereturns() {
   const [returnItems, setReturnItems] = useState([])
   const [returnNote, setReturnNote] = useState('')
 
-  // Filter returns
   const filteredReturns = (saleReturns || []).filter(sr => {
     const sale = sales.find(s => s.id === sr.saleId)
     const customer = customers.find(c => c.id === sr.customerId)
@@ -20,7 +19,6 @@ export default function Salereturns() {
            customer?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   })
 
-  // Summary stats
   const totalReturns = filteredReturns.length
   const totalReturnAmount = filteredReturns.reduce((sum, sr) => sum + (sr.total || 0), 0)
 
@@ -47,7 +45,6 @@ export default function Salereturns() {
     const sale = sales.find(s => s.id === parseInt(saleId))
     if (sale) {
       setSelectedSale(sale)
-      // Calculate already returned quantities
       const existingReturns = (saleReturns || []).filter(sr => sr.saleId === sale.id)
       const returnedQty = {}
       existingReturns.forEach(sr => {
@@ -118,7 +115,6 @@ export default function Salereturns() {
     }
   }
 
-  // Get sales that can have returns
   const salesWithItems = sales.filter(sale => {
     const existingReturns = (saleReturns || []).filter(sr => sr.saleId === sale.id)
     const returnedQty = {}
@@ -178,7 +174,17 @@ export default function Salereturns() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl">
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <span className="text-slate-400 text-sm">{filteredReturns.length} returns</span>
-          <input type="text" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm w-64 focus:outline-none focus:border-emerald-500" />
+          <input
+            id="srSearch"
+            name="srSearch"
+            autoComplete="off"
+            aria-label="Search sale returns"
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm w-64 focus:outline-none focus:border-emerald-500"
+          />
         </div>
 
         <div className="overflow-x-auto">
@@ -235,8 +241,8 @@ export default function Salereturns() {
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Select Sale */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Select Sale Invoice *</label>
-                <select value={selectedSale?.id || ''} onChange={(e) => handleSaleSelect(e.target.value)} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" required>
+                <label htmlFor="srSaleId" className="block text-sm font-medium text-slate-300 mb-2">Select Sale Invoice *</label>
+                <select id="srSaleId" name="srSaleId" value={selectedSale?.id || ''} onChange={(e) => handleSaleSelect(e.target.value)} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" required>
                   <option value="">Select a sale...</option>
                   {salesWithItems.map(sale => (
                     <option key={sale.id} value={sale.id}>{sale.invoiceNo} - {getCustomerName(sale.customerId)} - {business.currency} {sale.total?.toFixed(2)}</option>
@@ -288,7 +294,15 @@ export default function Salereturns() {
                               <td className="px-4 py-3">
                                 <div className="flex items-center justify-center gap-2">
                                   <button type="button" onClick={() => updateReturnQuantity(item.productId, item.returnQuantity - 1)} className="w-8 h-8 bg-slate-700 rounded text-white hover:bg-slate-600">-</button>
-                                  <input type="number" value={item.returnQuantity} onChange={(e) => updateReturnQuantity(item.productId, parseInt(e.target.value) || 0)} className="w-16 text-center bg-slate-900 border border-slate-700 rounded text-white py-1" min="0" max={item.maxQuantity} />
+                                  <input
+                                    aria-label={`Return quantity for ${item.name || getProductName(item.productId)}`}
+                                    type="number"
+                                    value={item.returnQuantity}
+                                    onChange={(e) => updateReturnQuantity(item.productId, parseInt(e.target.value) || 0)}
+                                    className="w-16 text-center bg-slate-900 border border-slate-700 rounded text-white py-1"
+                                    min="0"
+                                    max={item.maxQuantity}
+                                  />
                                   <button type="button" onClick={() => updateReturnQuantity(item.productId, item.returnQuantity + 1)} className="w-8 h-8 bg-slate-700 rounded text-white hover:bg-slate-600">+</button>
                                 </div>
                               </td>
@@ -303,8 +317,8 @@ export default function Salereturns() {
 
                   {/* Note */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Return Reason/Note</label>
-                    <textarea value={returnNote} onChange={(e) => setReturnNote(e.target.value)} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" placeholder="Reason for return..." />
+                    <label htmlFor="srReturnNote" className="block text-sm font-medium text-slate-300 mb-2">Return Reason/Note</label>
+                    <textarea id="srReturnNote" name="srReturnNote" value={returnNote} onChange={(e) => setReturnNote(e.target.value)} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" placeholder="Reason for return..." />
                   </div>
 
                   {/* Total */}

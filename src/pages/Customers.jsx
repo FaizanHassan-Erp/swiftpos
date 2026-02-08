@@ -210,7 +210,7 @@ export default function Customers() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="custPageSize" name="custPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -218,6 +218,10 @@ export default function Customers() {
             <span className="text-slate-400 text-sm">entries</span>
           </div>
           <input
+            id="custSearch"
+            name="custSearch"
+            autoComplete="off"
+            aria-label="Search customers"
             type="text"
             placeholder="Search..."
             value={searchTerm}
@@ -317,41 +321,41 @@ export default function Customers() {
 
               {formData.businessType === 'business' && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Business Name</label>
-                  <input type="text" value={formData.businessName} onChange={(e) => setFormData({ ...formData, businessName: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Business Name" />
+                  <label htmlFor="custBusinessName" className="block text-sm font-medium text-slate-300 mb-2">Business Name</label>
+                  <input id="custBusinessName" name="custBusinessName" autoComplete="organization" type="text" value={formData.businessName} onChange={(e) => setFormData({ ...formData, businessName: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Business Name" />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
-                  <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Customer Name" required />
+                  <label htmlFor="custName" className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
+                  <input id="custName" name="custName" autoComplete="name" type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Customer Name" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Mobile</label>
-                  <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Mobile Number" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Email" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Credit Limit</label>
-                  <input type="number" step="0.01" value={formData.creditLimit} onChange={(e) => setFormData({ ...formData, creditLimit: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
+                  <label htmlFor="custPhone" className="block text-sm font-medium text-slate-300 mb-2">Mobile</label>
+                  <input id="custPhone" name="custPhone" autoComplete="tel" type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Mobile Number" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Opening Balance</label>
-                  <input type="number" step="0.01" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
+                  <label htmlFor="custEmail" className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                  <input id="custEmail" name="custEmail" autoComplete="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" placeholder="Email" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Pay Term</label>
-                  <select value={formData.payTerm} onChange={(e) => setFormData({ ...formData, payTerm: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                  <label htmlFor="custCreditLimit" className="block text-sm font-medium text-slate-300 mb-2">Credit Limit</label>
+                  <input id="custCreditLimit" name="custCreditLimit" autoComplete="off" type="number" step="0.01" value={formData.creditLimit} onChange={(e) => setFormData({ ...formData, creditLimit: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="custOpeningBalance" className="block text-sm font-medium text-slate-300 mb-2">Opening Balance</label>
+                  <input id="custOpeningBalance" name="custOpeningBalance" autoComplete="off" type="number" step="0.01" value={formData.openingBalance} onChange={(e) => setFormData({ ...formData, openingBalance: parseFloat(e.target.value) || 0 })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" />
+                </div>
+                <div>
+                  <label htmlFor="custPayTerm" className="block text-sm font-medium text-slate-300 mb-2">Pay Term</label>
+                  <select id="custPayTerm" name="custPayTerm" value={formData.payTerm} onChange={(e) => setFormData({ ...formData, payTerm: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white">
                     <option value="">Select Pay Term</option>
                     <option value="Net 7">Net 7</option>
                     <option value="Net 15">Net 15</option>
@@ -361,8 +365,8 @@ export default function Customers() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Address</label>
-                <textarea value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" />
+                <label htmlFor="custAddress" className="block text-sm font-medium text-slate-300 mb-2">Address</label>
+                <textarea id="custAddress" name="custAddress" autoComplete="street-address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white" rows="2" />
               </div>
               
               <div className="flex justify-end gap-3 pt-4">

@@ -4,51 +4,68 @@ import { useApp } from '../Context/AppContext'
 // ============== MOVE THESE COMPONENTS OUTSIDE ==============
 
 // Toggle component
-const Toggle = ({ enabled, onChange, label }) => (
-  <label className="flex items-center gap-3 cursor-pointer">
-    <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
-      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
-    </div>
-    {label && <span className="text-slate-300">{label}</span>}
-    <input type="checkbox" className="sr-only" checked={enabled} onChange={onChange} />
-  </label>
-)
+const Toggle = ({ enabled, onChange, label, id, name }) => {
+  const fieldId = id || (label ? `bs-toggle-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}` : undefined)
+  const fieldName = name || fieldId
+  return (
+    <label className="flex items-center gap-3 cursor-pointer">
+      <div className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? 'bg-emerald-500' : 'bg-slate-600'}`}>
+        <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-5' : ''}`} />
+      </div>
+      {label && <span className="text-slate-300">{label}</span>}
+      <input type="checkbox" id={fieldId} name={fieldName} className="sr-only" checked={enabled} onChange={onChange} />
+    </label>
+  )
+}
 
 // Input field component
-const InputField = ({ label, value, onChange, type = 'text', placeholder, hint, required }) => (
-  <div>
-    <label className="block text-sm font-medium text-slate-300 mb-2">
-      {label} {required && <span className="text-red-400">*</span>}
-    </label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition-colors"
-    />
-    {hint && <p className="text-slate-500 text-xs mt-1">{hint}</p>}
-  </div>
-)
+const InputField = ({ label, value, onChange, type = 'text', placeholder, hint, required, id, name }) => {
+  const fieldId = id || `bs-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`
+  const fieldName = name || fieldId
+  return (
+    <div>
+      <label htmlFor={fieldId} className="block text-sm font-medium text-slate-300 mb-2">
+        {label} {required && <span className="text-red-400">*</span>}
+      </label>
+      <input
+        id={fieldId}
+        name={fieldName}
+        autoComplete="off"
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition-colors"
+      />
+      {hint && <p className="text-slate-500 text-xs mt-1">{hint}</p>}
+    </div>
+  )
+}
 
 // Select field component
-const SelectField = ({ label, value, onChange, options, hint }) => (
-  <div>
-    <label className="block text-sm font-medium text-slate-300 mb-2">{label}</label>
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition-colors"
-    >
-      {options.map(opt => (
-        <option key={opt.value !== undefined ? opt.value : opt} value={opt.value !== undefined ? opt.value : opt}>
-          {opt.label || opt}
-        </option>
-      ))}
-    </select>
-    {hint && <p className="text-slate-500 text-xs mt-1">{hint}</p>}
-  </div>
-)
+const SelectField = ({ label, value, onChange, options, hint, id, name }) => {
+  const fieldId = id || `bs-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`
+  const fieldName = name || fieldId
+  return (
+    <div>
+      <label htmlFor={fieldId} className="block text-sm font-medium text-slate-300 mb-2">{label}</label>
+      <select
+        id={fieldId}
+        name={fieldName}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500 transition-colors"
+      >
+        {options.map(opt => (
+          <option key={opt.value !== undefined ? opt.value : opt} value={opt.value !== undefined ? opt.value : opt}>
+            {opt.label || opt}
+          </option>
+        ))}
+      </select>
+      {hint && <p className="text-slate-500 text-xs mt-1">{hint}</p>}
+    </div>
+  )
+}
 
 // Tab icons
 const tabIcons = {
@@ -437,8 +454,10 @@ export default function Settings() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Currency</label>
+                  <label htmlFor="bsCurrency" className="block text-sm font-medium text-slate-300 mb-2">Currency</label>
                   <select
+                    id="bsCurrency"
+                    name="bsCurrency"
                     value={formData.currency}
                     onChange={(e) => handleCurrencyChange(e.target.value)}
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -466,14 +485,14 @@ export default function Settings() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Upload Logo</label>
+                <label htmlFor="bsLogo" className="block text-sm font-medium text-slate-300 mb-2">Upload Logo</label>
                 <div className="flex items-center gap-4">
                   {formData.logo && (
                     <img src={formData.logo} alt="Logo" className="w-16 h-16 object-contain bg-white rounded-lg" />
                   )}
                   <label className="px-4 py-2 bg-emerald-500 text-white rounded-lg cursor-pointer hover:bg-emerald-600 transition-colors">
                     Browse...
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    <input id="bsLogo" name="bsLogo" type="file" accept="image/*" className="hidden" onChange={(e) => {
                       const file = e.target.files[0]
                       if (file) {
                         const reader = new FileReader()
@@ -871,10 +890,11 @@ export default function Settings() {
                       />
                       <span className="text-white font-medium">{method.name}</span>
                     </div>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label htmlFor={`bsDefaultPayment-${method.id}`} className="flex items-center gap-2 cursor-pointer">
                       <input
+                        id={`bsDefaultPayment-${method.id}`}
                         type="radio"
-                        name="defaultPayment"
+                        name="bsDefaultPayment"
                         checked={method.isDefault}
                         onChange={() => {
                           setFormData(prev => ({

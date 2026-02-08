@@ -84,7 +84,7 @@ export default function Brands() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="brPageSize" name="brPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -93,6 +93,10 @@ export default function Brands() {
           </div>
           <div className="relative">
             <input
+              id="brSearch"
+              name="brSearch"
+              autoComplete="off"
+              aria-label="Search brands"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -168,8 +172,11 @@ export default function Brands() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Brand Name *</label>
+                <label htmlFor="brName" className="block text-sm font-medium text-slate-300 mb-2">Brand Name *</label>
                 <input
+                  id="brName"
+                  name="brName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -180,8 +187,11 @@ export default function Brands() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Short Description</label>
+                <label htmlFor="brDescription" className="block text-sm font-medium text-slate-300 mb-2">Short Description</label>
                 <input
+                  id="brDescription"
+                  name="brDescription"
+                  autoComplete="off"
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}

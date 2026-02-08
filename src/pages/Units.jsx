@@ -87,7 +87,7 @@ export default function Units() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="unPageSize" name="unPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
               <option>50</option>
               <option>100</option>
@@ -96,6 +96,10 @@ export default function Units() {
           </div>
           <div className="relative">
             <input
+              id="unSearch"
+              name="unSearch"
+              autoComplete="off"
+              aria-label="Search units"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -181,8 +185,11 @@ export default function Units() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
+                <label htmlFor="unName" className="block text-sm font-medium text-slate-300 mb-2">Name *</label>
                 <input
+                  id="unName"
+                  name="unName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -193,8 +200,11 @@ export default function Units() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Short Name *</label>
+                <label htmlFor="unShortName" className="block text-sm font-medium text-slate-300 mb-2">Short Name *</label>
                 <input
+                  id="unShortName"
+                  name="unShortName"
+                  autoComplete="off"
                   type="text"
                   value={formData.shortName}
                   onChange={(e) => setFormData({ ...formData, shortName: e.target.value })}
@@ -205,8 +215,10 @@ export default function Units() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Allow Decimal *</label>
+                <label htmlFor="unAllowDecimal" className="block text-sm font-medium text-slate-300 mb-2">Allow Decimal *</label>
                 <select
+                  id="unAllowDecimal"
+                  name="unAllowDecimal"
                   value={formData.allowDecimal ? 'yes' : 'no'}
                   onChange={(e) => setFormData({ ...formData, allowDecimal: e.target.value === 'yes' })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

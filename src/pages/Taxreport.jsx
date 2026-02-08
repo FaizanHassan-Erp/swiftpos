@@ -349,8 +349,10 @@ export default function Taxreport() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Date Range</label>
+            <label htmlFor="txrDateRange" className="block text-sm text-slate-400 mb-1">Date Range</label>
             <select
+              id="txrDateRange"
+              name="txrDateRange"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -372,8 +374,10 @@ export default function Taxreport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+                <label htmlFor="txrStartDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
                 <input
+                  id="txrStartDate"
+                  name="txrStartDate"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -381,8 +385,10 @@ export default function Taxreport() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">End Date</label>
+                <label htmlFor="txrEndDate" className="block text-sm text-slate-400 mb-1">End Date</label>
                 <input
+                  id="txrEndDate"
+                  name="txrEndDate"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -393,8 +399,10 @@ export default function Taxreport() {
           )}
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">View Mode</label>
+            <label htmlFor="txrViewMode" className="block text-sm text-slate-400 mb-1">View Mode</label>
             <select
+              id="txrViewMode"
+              name="txrViewMode"
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"

@@ -222,6 +222,10 @@ export default function TaxRates() {
             </div>
             <div className="relative">
               <input
+                id="trSearch"
+                name="trSearch"
+                autoComplete="off"
+                aria-label="Search tax rates"
                 type="text"
                 placeholder="Search..."
                 value={searchTerm}
@@ -413,10 +417,13 @@ export default function TaxRates() {
               // Tax Rate Form
               <form onSubmit={handleSaveRate} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="trRateName" className="block text-sm font-medium text-slate-300 mb-2">
                     Name <span className="text-red-400">*</span>
                   </label>
                   <input
+                    id="trRateName"
+                    name="trRateName"
+                    autoComplete="off"
                     type="text"
                     value={rateForm.name}
                     onChange={(e) => setRateForm(prev => ({ ...prev, name: e.target.value }))}
@@ -427,11 +434,14 @@ export default function TaxRates() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="trRatePercent" className="block text-sm font-medium text-slate-300 mb-2">
                     Tax Rate % <span className="text-red-400">*</span>
                     <span className="ml-1 text-emerald-400 cursor-help" title="Enter the tax percentage">ⓘ</span>
                   </label>
                   <input
+                    id="trRatePercent"
+                    name="trRatePercent"
+                    autoComplete="off"
                     type="number"
                     step="0.01"
                     value={rateForm.rate}
@@ -446,6 +456,7 @@ export default function TaxRates() {
                   <input
                     type="checkbox"
                     id="forTaxGroupOnly"
+                    name="forTaxGroupOnly"
                     checked={rateForm.forTaxGroupOnly}
                     onChange={(e) => setRateForm(prev => ({ ...prev, forTaxGroupOnly: e.target.checked }))}
                     className="w-5 h-5 rounded bg-slate-700 border-slate-600 text-emerald-500 focus:ring-emerald-500"
@@ -476,10 +487,13 @@ export default function TaxRates() {
               // Tax Group Form
               <form onSubmit={handleSaveGroup} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                  <label htmlFor="trGroupName" className="block text-sm font-medium text-slate-300 mb-2">
                     Name <span className="text-red-400">*</span>
                   </label>
                   <input
+                    id="trGroupName"
+                    name="trGroupName"
+                    autoComplete="off"
                     type="text"
                     value={groupForm.name}
                     onChange={(e) => setGroupForm(prev => ({ ...prev, name: e.target.value }))}
@@ -506,6 +520,7 @@ export default function TaxRates() {
                         >
                           <input
                             type="checkbox"
+                            name="trSubTaxes"
                             checked={groupForm.subTaxes.includes(tax.id)}
                             onChange={() => handleSubTaxToggle(tax.id)}
                             className="w-5 h-5 rounded bg-slate-700 border-slate-600 text-emerald-500 focus:ring-emerald-500"

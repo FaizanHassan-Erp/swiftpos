@@ -229,6 +229,9 @@ export default function PurchaseReturns() {
           <span className="text-slate-400 text-sm">All Purchase Returns</span>
           <div className="relative">
             <input
+              id="prSearch"
+              name="prSearch"
+              autoComplete="off"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -330,8 +333,10 @@ export default function PurchaseReturns() {
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Supplier *</label>
+                    <label htmlFor="prSupplierId" className="block text-sm font-medium text-slate-300 mb-2">Supplier *</label>
                     <select
+                      id="prSupplierId"
+                      name="prSupplierId"
                       value={formData.supplierId}
                       onChange={(e) => setFormData({ ...formData, supplierId: e.target.value, purchaseId: '' })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -344,8 +349,10 @@ export default function PurchaseReturns() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Parent Purchase</label>
+                    <label htmlFor="prPurchaseId" className="block text-sm font-medium text-slate-300 mb-2">Parent Purchase</label>
                     <select
+                      id="prPurchaseId"
+                      name="prPurchaseId"
                       value={formData.purchaseId}
                       onChange={(e) => setFormData({ ...formData, purchaseId: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -360,8 +367,11 @@ export default function PurchaseReturns() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
+                    <label htmlFor="prDate" className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
                     <input
+                      id="prDate"
+                      name="prDate"
+                      autoComplete="off"
                       type="datetime-local"
                       value={formData.date}
                       onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -373,9 +383,12 @@ export default function PurchaseReturns() {
 
                 {/* Product Search */}
                 <div className="bg-slate-900/50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Search Products</label>
+                  <label htmlFor="prProductSearch" className="block text-sm font-medium text-slate-300 mb-2">Search Products</label>
                   <div className="relative">
                     <input
+                      id="prProductSearch"
+                      name="prProductSearch"
+                      autoComplete="off"
                       type="text"
                       value={productSearch}
                       onChange={(e) => setProductSearch(e.target.value)}
@@ -443,6 +456,8 @@ export default function PurchaseReturns() {
                               <input
                                 type="number"
                                 min="1"
+                                name={`prItemQty_${item.productId}`}
+                                aria-label={`Quantity for ${item.name}`}
                                 value={item.quantity}
                                 onChange={(e) => updateItemQuantity(item.productId, parseInt(e.target.value) || 0)}
                                 className="w-20 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-center"
@@ -453,6 +468,8 @@ export default function PurchaseReturns() {
                                 type="number"
                                 min="0"
                                 step="0.01"
+                                name={`prItemCost_${item.productId}`}
+                                aria-label={`Unit cost for ${item.name}`}
                                 value={item.unitCost}
                                 onChange={(e) => updateItemCost(item.productId, e.target.value)}
                                 className="w-24 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-center"
@@ -489,8 +506,11 @@ export default function PurchaseReturns() {
 
                 {/* Note */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Note</label>
+                  <label htmlFor="prNote" className="block text-sm font-medium text-slate-300 mb-2">Note</label>
                   <textarea
+                    id="prNote"
+                    name="prNote"
+                    autoComplete="off"
                     value={formData.note}
                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"

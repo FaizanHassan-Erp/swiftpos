@@ -248,8 +248,8 @@ export default function ProfitLossReport() {
       <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 print:hidden">
         <div className="flex flex-wrap items-center gap-4">
           <div>
-            <label className="block text-slate-400 text-sm mb-1">Period</label>
-            <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[160px]">
+            <label htmlFor="plrPeriod" className="block text-slate-400 text-sm mb-1">Period</label>
+            <select id="plrPeriod" name="plrPeriod" value={dateRange} onChange={(e) => setDateRange(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none min-w-[160px]">
               <option value="all">All Time</option>
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
@@ -266,12 +266,12 @@ export default function ProfitLossReport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Start Date</label>
-                <input type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="plrStartDate" className="block text-slate-400 text-sm mb-1">Start Date</label>
+                <input id="plrStartDate" name="plrStartDate" type="date" value={customStartDate} onChange={(e) => setCustomStartDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">End Date</label>
-                <input type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
+                <label htmlFor="plrEndDate" className="block text-slate-400 text-sm mb-1">End Date</label>
+                <input id="plrEndDate" name="plrEndDate" type="date" value={customEndDate} onChange={(e) => setCustomEndDate(e.target.value)} className="bg-slate-900 text-white px-4 py-2 rounded-lg border border-slate-700 focus:border-emerald-500 focus:outline-none" />
               </div>
             </>
           )}

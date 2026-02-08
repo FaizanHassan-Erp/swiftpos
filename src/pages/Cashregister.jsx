@@ -499,29 +499,35 @@ export default function CashRegister() {
             </div>
             <form onSubmit={handleOpenRegister} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Opening Cash Amount *</label>
+                <label htmlFor="openingAmount" className="block text-sm font-medium text-slate-300 mb-2">Opening Cash Amount *</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{currency}</span>
                   <input
+                    id="openingAmount"
+                    name="openingAmount"
                     type="number"
                     step="0.01"
                     value={openingAmount}
                     onChange={(e) => setOpeningAmount(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
                     placeholder="0.00"
+                    autoComplete="off"
                     required
                   />
                 </div>
                 <p className="text-slate-500 text-xs mt-1">Count the cash in the drawer before opening</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Note (Optional)</label>
+                <label htmlFor="openingNote" className="block text-sm font-medium text-slate-300 mb-2">Note (Optional)</label>
                 <textarea
+                  id="openingNote"
+                  name="openingNote"
                   value={openingNote}
                   onChange={(e) => setOpeningNote(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white resize-none focus:outline-none focus:border-emerald-500"
                   rows="2"
                   placeholder="Any notes about the opening..."
+                  autoComplete="off"
                 />
               </div>
               <button
@@ -577,16 +583,19 @@ export default function CashRegister() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Actual Cash Count *</label>
+                <label htmlFor="closingAmount" className="block text-sm font-medium text-slate-300 mb-2">Actual Cash Count *</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{currency}</span>
                   <input
+                    id="closingAmount"
+                    name="closingAmount"
                     type="number"
                     step="0.01"
                     value={closingAmount}
                     onChange={(e) => setClosingAmount(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
                     placeholder="0.00"
+                    autoComplete="off"
                     required
                   />
                 </div>
@@ -618,13 +627,16 @@ export default function CashRegister() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Closing Note (Optional)</label>
+                <label htmlFor="closingNote" className="block text-sm font-medium text-slate-300 mb-2">Closing Note (Optional)</label>
                 <textarea
+                  id="closingNote"
+                  name="closingNote"
                   value={closingNote}
                   onChange={(e) => setClosingNote(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white resize-none focus:outline-none focus:border-emerald-500"
                   rows="2"
                   placeholder="Any notes about the closing..."
+                  autoComplete="off"
                 />
               </div>
 
@@ -665,29 +677,35 @@ export default function CashRegister() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Amount *</label>
+                <label htmlFor="cashAmount" className="block text-sm font-medium text-slate-300 mb-2">Amount *</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{currency}</span>
                   <input
+                    id="cashAmount"
+                    name="cashAmount"
                     type="number"
                     step="0.01"
                     value={cashAmount}
                     onChange={(e) => setCashAmount(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
                     placeholder="0.00"
+                    autoComplete="off"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Reason / Note *</label>
+                <label htmlFor="cashNote" className="block text-sm font-medium text-slate-300 mb-2">Reason / Note *</label>
                 <textarea
+                  id="cashNote"
+                  name="cashNote"
                   value={cashNote}
                   onChange={(e) => setCashNote(e.target.value)}
                   className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white resize-none focus:outline-none focus:border-emerald-500"
                   rows="2"
                   placeholder={cashMovementType === 'in' ? 'e.g., Change refill' : 'e.g., Petty cash for supplies'}
+                  autoComplete="off"
                   required
                 />
               </div>

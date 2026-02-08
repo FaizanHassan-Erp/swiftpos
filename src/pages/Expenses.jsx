@@ -5,7 +5,7 @@ import { useApp } from '../Context/AppContext'
 export default function Expenses() {
   const navigate = useNavigate()
   const { state, dispatch } = useApp()
-  const { expenses, expenseCategories, business, suppliers, customers, paymentAccounts = [] } = state
+  const { expenses, expenseCategories = [], business, suppliers, customers, paymentAccounts = [] } = state
   
   const [activeTab, setActiveTab] = useState('expenses')
   const [showModal, setShowModal] = useState(false)
@@ -21,7 +21,6 @@ export default function Expenses() {
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
 
-  // Form data for expense
   const [formData, setFormData] = useState({
     date: new Date().toISOString().slice(0, 16),
     categoryId: '',
@@ -40,13 +39,11 @@ export default function Expenses() {
     isRefund: false
   })
 
-  // Form data for category
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     code: ''
   })
 
-  // Payment form
   const [paymentData, setPaymentData] = useState({
     amount: 0,
     method: 'cash',
@@ -55,45 +52,38 @@ export default function Expenses() {
     note: ''
   })
 
-  // Filter active payment accounts
   const activeAccounts = paymentAccounts.filter(acc => acc.status !== 'closed')
 
-  // Filter expenses
   const filteredExpenses = (expenses || []).filter(exp => {
     const matchesSearch = exp.referenceNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          exp.note?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = !filterCategory || exp.categoryId === parseInt(filterCategory)
+    const matchesCategory = !filterCategory || String(exp.categoryId) === String(filterCategory)
     const matchesStatus = filterStatus === 'all' || exp.paymentStatus === filterStatus
     return matchesSearch && matchesCategory && matchesStatus
   }).sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
 
-  // Summary calculations
   const totalExpenses = filteredExpenses.reduce((sum, e) => sum + (e.totalAmount || 0), 0)
   const totalPaid = filteredExpenses.reduce((sum, e) => sum + (e.amountPaid || 0), 0)
   const totalDue = totalExpenses - totalPaid
   const expenseCount = filteredExpenses.length
 
-  // Get category name
   function getCategoryName(id) {
-    return expenseCategories?.find(c => c.id === id)?.name || '-'
+    return expenseCategories?.find(c => String(c.id) === String(id))?.name || '-'
   }
 
-  // Get contact name
   function getContactName(type, id) {
     if (type === 'supplier') {
-      return suppliers?.find(s => s.id === id)?.name || '-'
+      return suppliers?.find(s => String(s.id) === String(id))?.name || '-'
     } else if (type === 'customer') {
-      return customers?.find(c => c.id === id)?.name || '-'
+      return customers?.find(c => String(c.id) === String(id))?.name || '-'
     }
     return '-'
   }
 
-  // Get payment account name
   function getAccountName(id) {
-    return paymentAccounts?.find(a => a.id === id)?.name || '-'
+    return paymentAccounts?.find(a => String(a.id) === String(id))?.name || '-'
   }
 
-  // Get active expense for dropdown
   const activeExpense = expenses?.find(e => e.id === activeDropdown)
 
   function resetForm() {
@@ -184,7 +174,6 @@ export default function Expenses() {
       return
     }
 
-    // Determine payment status
     let paymentStatus = 'due'
     if (formData.amountPaid >= formData.totalAmount) {
       paymentStatus = 'paid'
@@ -196,9 +185,9 @@ export default function Expenses() {
       ...formData,
       paymentStatus,
       date: new Date(formData.date).toISOString(),
-      categoryId: parseInt(formData.categoryId),
-      contactId: formData.contactId ? parseInt(formData.contactId) : null,
-      paymentAccountId: formData.paymentAccountId ? parseInt(formData.paymentAccountId) : null,
+      categoryId: formData.categoryId,
+      contactId: formData.contactId || null,
+      paymentAccountId: formData.paymentAccountId || null,
       location: business.name
     }
 
@@ -226,7 +215,7 @@ export default function Expenses() {
         expenseId: selectedExpense.id,
         amount: parseFloat(paymentData.amount),
         method: paymentData.method,
-        paymentAccountId: paymentData.paymentAccountId ? parseInt(paymentData.paymentAccountId) : null,
+        paymentAccountId: paymentData.paymentAccountId || null,
         date: paymentData.date,
         note: paymentData.note
       }
@@ -242,7 +231,6 @@ export default function Expenses() {
     setActiveDropdown(null)
   }
 
-  // Category functions
   function openCategoryModal(category = null) {
     setEditingCategory(category)
     if (category) {
@@ -267,7 +255,10 @@ export default function Expenses() {
         payload: { ...editingCategory, ...categoryForm } 
       })
     } else {
-      dispatch({ type: 'ADD_EXPENSE_CATEGORY', payload: categoryForm })
+      dispatch({ 
+        type: 'ADD_EXPENSE_CATEGORY', 
+        payload: { ...categoryForm, id: Date.now() } 
+      })
     }
     
     setShowCategoryModal(false)
@@ -275,7 +266,7 @@ export default function Expenses() {
   }
 
   function handleDeleteCategory(id) {
-    const isUsed = expenses?.some(e => e.categoryId === id)
+    const isUsed = expenses?.some(e => String(e.categoryId) === String(id))
     if (isUsed) {
       alert('Cannot delete category. It is being used by expenses.')
       return
@@ -285,14 +276,12 @@ export default function Expenses() {
     }
   }
 
-  // Expense for options
   const expenseForOptions = [
     { value: 'business', label: 'Business/General' },
     { value: 'supplier', label: 'Supplier' },
     { value: 'customer', label: 'Customer' }
   ]
 
-  // Recurring intervals
   const recurringIntervals = [
     { value: 'daily', label: 'Daily' },
     { value: 'weekly', label: 'Weekly' },
@@ -409,6 +398,9 @@ export default function Expenses() {
             {/* Filters */}
             <div className="p-4 border-b border-slate-700/50 flex flex-wrap items-center gap-4">
               <select
+                id="expFilterCategory"
+                name="expFilterCategory"
+                aria-label="Filter by expense category"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
                 className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -420,6 +412,9 @@ export default function Expenses() {
               </select>
 
               <select
+                id="expFilterStatus"
+                name="expFilterStatus"
+                aria-label="Filter by payment status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -434,6 +429,10 @@ export default function Expenses() {
 
               <div className="relative">
                 <input
+                  id="expSearch"
+                  name="expSearch"
+                  autoComplete="off"
+                  aria-label="Search expenses"
                   type="text"
                   placeholder="Search expenses..."
                   value={searchTerm}
@@ -573,7 +572,7 @@ export default function Expenses() {
                     </tr>
                   ) : (
                     (expenseCategories || []).map(category => {
-                      const categoryExpenses = expenses?.filter(e => e.categoryId === category.id) || []
+                      const categoryExpenses = expenses?.filter(e => String(e.categoryId) === String(category.id)) || []
                       const totalSpent = categoryExpenses.reduce((sum, e) => sum + (e.totalAmount || 0), 0)
                       return (
                         <tr key={category.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
@@ -670,8 +669,10 @@ export default function Expenses() {
               {/* Row 1 */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Business Location</label>
+                  <label htmlFor="expLocation" className="block text-sm font-medium text-slate-300 mb-2">Business Location</label>
                   <input
+                    id="expLocation"
+                    name="expLocation"
                     type="text"
                     value={business.name}
                     readOnly
@@ -679,8 +680,10 @@ export default function Expenses() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Expense Category *</label>
+                  <label htmlFor="expCategoryId" className="block text-sm font-medium text-slate-300 mb-2">Expense Category *</label>
                   <select
+                    id="expCategoryId"
+                    name="expCategoryId"
                     value={formData.categoryId}
                     onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -693,8 +696,10 @@ export default function Expenses() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
+                  <label htmlFor="expDate" className="block text-sm font-medium text-slate-300 mb-2">Date *</label>
                   <input
+                    id="expDate"
+                    name="expDate"
                     type="datetime-local"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -707,8 +712,10 @@ export default function Expenses() {
               {/* Row 2 */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Expense For</label>
+                  <label htmlFor="expExpenseFor" className="block text-sm font-medium text-slate-300 mb-2">Expense For</label>
                   <select
+                    id="expExpenseFor"
+                    name="expExpenseFor"
                     value={formData.expenseFor}
                     onChange={(e) => setFormData({ ...formData, expenseFor: e.target.value, contactId: '' })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -720,10 +727,12 @@ export default function Expenses() {
                 </div>
                 {formData.expenseFor !== 'business' && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label htmlFor="expContactId" className="block text-sm font-medium text-slate-300 mb-2">
                       Select {formData.expenseFor === 'supplier' ? 'Supplier' : 'Customer'}
                     </label>
                     <select
+                      id="expContactId"
+                      name="expContactId"
                       value={formData.contactId}
                       onChange={(e) => setFormData({ ...formData, contactId: e.target.value })}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -739,10 +748,13 @@ export default function Expenses() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Total Amount *</label>
+                  <label htmlFor="expTotalAmount" className="block text-sm font-medium text-slate-300 mb-2">Total Amount *</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{business.currency}</span>
                     <input
+                      id="expTotalAmount"
+                      name="expTotalAmount"
+                      autoComplete="off"
                       type="number"
                       step="0.01"
                       min="0"
@@ -759,8 +771,10 @@ export default function Expenses() {
               {/* Row 3 - Payment */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
+                  <label htmlFor="expPaymentMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
                   <select
+                    id="expPaymentMethod"
+                    name="expPaymentMethod"
                     value={formData.paymentMethod}
                     onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -773,8 +787,10 @@ export default function Expenses() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
+                  <label htmlFor="expPaymentAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
                   <select
+                    id="expPaymentAccountId"
+                    name="expPaymentAccountId"
                     value={formData.paymentAccountId}
                     onChange={(e) => setFormData({ ...formData, paymentAccountId: e.target.value })}
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -789,10 +805,13 @@ export default function Expenses() {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
+                  <label htmlFor="expAmountPaid" className="block text-sm font-medium text-slate-300 mb-2">Amount Paid</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{business.currency}</span>
                     <input
+                      id="expAmountPaid"
+                      name="expAmountPaid"
+                      autoComplete="off"
                       type="number"
                       step="0.01"
                       min="0"
@@ -807,8 +826,10 @@ export default function Expenses() {
 
               {/* Expense Note */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Expense Note</label>
+                <label htmlFor="expNote" className="block text-sm font-medium text-slate-300 mb-2">Expense Note</label>
                 <textarea
+                  id="expNote"
+                  name="expNote"
                   value={formData.note}
                   onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white resize-none"
@@ -819,8 +840,10 @@ export default function Expenses() {
 
               {/* Options */}
               <div className="flex flex-wrap gap-6">
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label htmlFor="expIsRefund" className="flex items-center gap-2 cursor-pointer">
                   <input
+                    id="expIsRefund"
+                    name="expIsRefund"
                     type="checkbox"
                     checked={formData.isRefund}
                     onChange={(e) => setFormData({ ...formData, isRefund: e.target.checked })}
@@ -829,8 +852,10 @@ export default function Expenses() {
                   <span className="text-slate-300 text-sm">Is Refund?</span>
                 </label>
 
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label htmlFor="expIsRecurring" className="flex items-center gap-2 cursor-pointer">
                   <input
+                    id="expIsRecurring"
+                    name="expIsRecurring"
                     type="checkbox"
                     checked={formData.isRecurring}
                     onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
@@ -841,6 +866,9 @@ export default function Expenses() {
 
                 {formData.isRecurring && (
                   <select
+                    id="expRecurringInterval"
+                    name="expRecurringInterval"
+                    aria-label="Recurring interval"
                     value={formData.recurringInterval}
                     onChange={(e) => setFormData({ ...formData, recurringInterval: e.target.value })}
                     className="px-3 py-1 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm"
@@ -887,7 +915,6 @@ export default function Expenses() {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Info Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-slate-900/50 p-3 rounded-lg">
                   <p className="text-slate-400 text-sm">Date</p>
@@ -914,7 +941,6 @@ export default function Expenses() {
                 </div>
               </div>
 
-              {/* Amount Summary */}
               <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
                 <div className="flex justify-between text-lg font-medium">
                   <span className="text-slate-300">Total Amount:</span>
@@ -930,7 +956,6 @@ export default function Expenses() {
                 </div>
               </div>
 
-              {/* Note */}
               {selectedExpense.note && (
                 <div className="bg-slate-900/50 p-4 rounded-lg">
                   <p className="text-slate-400 text-sm mb-1">Note</p>
@@ -938,7 +963,6 @@ export default function Expenses() {
                 </div>
               )}
 
-              {/* Actions */}
               <div className="flex justify-end gap-3">
                 {selectedExpense.paymentStatus !== 'paid' && (
                   <button
@@ -990,10 +1014,13 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Amount *</label>
+                <label htmlFor="expPayAmount" className="block text-sm font-medium text-slate-300 mb-2">Payment Amount *</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">{business.currency}</span>
                   <input
+                    id="expPayAmount"
+                    name="expPayAmount"
+                    autoComplete="off"
                     type="number"
                     step="0.01"
                     min="0"
@@ -1007,8 +1034,10 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
+                <label htmlFor="expPayMethod" className="block text-sm font-medium text-slate-300 mb-2">Payment Method</label>
                 <select
+                  id="expPayMethod"
+                  name="expPayMethod"
                   value={paymentData.method}
                   onChange={(e) => setPaymentData({ ...paymentData, method: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -1022,8 +1051,10 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
+                <label htmlFor="expPayAccountId" className="block text-sm font-medium text-slate-300 mb-2">Payment Account *</label>
                 <select
+                  id="expPayAccountId"
+                  name="expPayAccountId"
                   value={paymentData.paymentAccountId}
                   onChange={(e) => setPaymentData({ ...paymentData, paymentAccountId: e.target.value })}
                   className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white"
@@ -1036,8 +1067,10 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Payment Date</label>
+                <label htmlFor="expPayDate" className="block text-sm font-medium text-slate-300 mb-2">Payment Date</label>
                 <input
+                  id="expPayDate"
+                  name="expPayDate"
                   type="date"
                   value={paymentData.date}
                   onChange={(e) => setPaymentData({ ...paymentData, date: e.target.value })}
@@ -1046,8 +1079,11 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Note</label>
+                <label htmlFor="expPayNote" className="block text-sm font-medium text-slate-300 mb-2">Note</label>
                 <input
+                  id="expPayNote"
+                  name="expPayNote"
+                  autoComplete="off"
                   type="text"
                   value={paymentData.note}
                   onChange={(e) => setPaymentData({ ...paymentData, note: e.target.value })}
@@ -1093,8 +1129,11 @@ export default function Expenses() {
             
             <form onSubmit={handleCategorySubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Category Name *</label>
+                <label htmlFor="expCatName" className="block text-sm font-medium text-slate-300 mb-2">Category Name *</label>
                 <input
+                  id="expCatName"
+                  name="expCatName"
+                  autoComplete="off"
                   type="text"
                   value={categoryForm.name}
                   onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
@@ -1105,8 +1144,11 @@ export default function Expenses() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Category Code</label>
+                <label htmlFor="expCatCode" className="block text-sm font-medium text-slate-300 mb-2">Category Code</label>
                 <input
+                  id="expCatCode"
+                  name="expCatCode"
+                  autoComplete="off"
                   type="text"
                   value={categoryForm.code}
                   onChange={(e) => setCategoryForm({ ...categoryForm, code: e.target.value })}

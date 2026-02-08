@@ -63,7 +63,7 @@ export default function Roles() {
     if (editingRole) {
       dispatch({ type: 'UPDATE_ROLE', payload: { ...editingRole, ...formData } })
     } else {
-      dispatch({ type: 'ADD_ROLE', payload: formData })
+      dispatch({ type: 'ADD_ROLE', payload: { ...formData, id: Date.now().toString() } })
     }
     
     setShowModal(false)
@@ -104,13 +104,17 @@ export default function Roles() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+            <select id="rolePageSize" name="rolePageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
               <option>25</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
           <div className="relative">
             <input
+              id="roleSearch"
+              name="roleSearch"
+              autoComplete="off"
+              aria-label="Search roles"
               type="text"
               placeholder="Search..."
               value={searchTerm}
@@ -135,8 +139,8 @@ export default function Roles() {
                   <td colSpan="2" className="text-center py-8 text-slate-500">No roles found</td>
                 </tr>
               ) : (
-                filteredRoles.map(role => (
-                  <tr key={role.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
+                filteredRoles.map((role, index) => (
+                  <tr key={role.id || `role-${index}`} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3 text-white">{role.name}</td>
                     <td className="px-4 py-3">
                       {role.canDelete === false ? (
@@ -193,8 +197,11 @@ export default function Roles() {
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Role Name *</label>
+                <label htmlFor="roleName" className="block text-sm font-medium text-slate-300 mb-2">Role Name *</label>
                 <input
+                  id="roleName"
+                  name="roleName"
+                  autoComplete="off"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -210,6 +217,7 @@ export default function Roles() {
                     <label key={perm.id} className="flex items-center gap-2 p-2 bg-slate-900/50 rounded-lg cursor-pointer hover:bg-slate-900">
                       <input
                         type="checkbox"
+                        name="rolePermissions"
                         checked={formData.permissions.includes(perm.id)}
                         onChange={() => handlePermissionChange(perm.id)}
                         className="rounded bg-slate-700 border-slate-600 text-emerald-500 focus:ring-emerald-500"

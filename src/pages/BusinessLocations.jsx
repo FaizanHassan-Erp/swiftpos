@@ -279,6 +279,10 @@ export default function BusinessLocations() {
           <h2 className="text-lg font-semibold text-white">All Locations</h2>
           <div className="relative">
             <input
+              id="blSearch"
+              name="blSearch"
+              aria-label="Search locations"
+              autoComplete="off"
               type="text"
               placeholder="Search locations..."
               value={searchTerm}
@@ -411,10 +415,13 @@ export default function BusinessLocations() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label htmlFor="blName" className="block text-sm font-medium text-slate-300 mb-2">
                       Location Name <span className="text-red-400">*</span>
                     </label>
                     <input
+                      id="blName"
+                      name="blName"
+                      autoComplete="off"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleChange('name', e.target.value)}
@@ -424,11 +431,14 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <label htmlFor="blLocationId" className="block text-sm font-medium text-slate-300 mb-2">
                       Location ID
                       <span className="ml-1 text-emerald-400 cursor-help" title="Unique identifier for this location">ⓘ</span>
                     </label>
                     <input
+                      id="blLocationId"
+                      name="blLocationId"
+                      autoComplete="off"
                       type="text"
                       value={formData.locationId}
                       onChange={(e) => handleChange('locationId', e.target.value)}
@@ -450,8 +460,11 @@ export default function BusinessLocations() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Landmark / Address</label>
+                    <label htmlFor="blLandmark" className="block text-sm font-medium text-slate-300 mb-2">Landmark / Address</label>
                     <input
+                      id="blLandmark"
+                      name="blLandmark"
+                      autoComplete="off"
                       type="text"
                       value={formData.landmark}
                       onChange={(e) => handleChange('landmark', e.target.value)}
@@ -460,8 +473,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">City</label>
+                    <label htmlFor="blCity" className="block text-sm font-medium text-slate-300 mb-2">City</label>
                     <input
+                      id="blCity"
+                      name="blCity"
+                      autoComplete="off"
                       type="text"
                       value={formData.city}
                       onChange={(e) => handleChange('city', e.target.value)}
@@ -470,8 +486,10 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">State / Province</label>
+                    <label htmlFor="blState" className="block text-sm font-medium text-slate-300 mb-2">State / Province</label>
                     <select
+                      id="blState"
+                      name="blState"
                       value={formData.state}
                       onChange={(e) => handleChange('state', e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -483,8 +501,10 @@ export default function BusinessLocations() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Country</label>
+                    <label htmlFor="blCountry" className="block text-sm font-medium text-slate-300 mb-2">Country</label>
                     <select
+                      id="blCountry"
+                      name="blCountry"
                       value={formData.country}
                       onChange={(e) => handleChange('country', e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
@@ -495,8 +515,11 @@ export default function BusinessLocations() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Zip / Postal Code</label>
+                    <label htmlFor="blZipCode" className="block text-sm font-medium text-slate-300 mb-2">Zip / Postal Code</label>
                     <input
+                      id="blZipCode"
+                      name="blZipCode"
+                      autoComplete="off"
                       type="text"
                       value={formData.zipCode}
                       onChange={(e) => handleChange('zipCode', e.target.value)}
@@ -517,8 +540,11 @@ export default function BusinessLocations() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Mobile Number</label>
+                    <label htmlFor="blMobile" className="block text-sm font-medium text-slate-300 mb-2">Mobile Number</label>
                     <input
+                      id="blMobile"
+                      name="blMobile"
+                      autoComplete="off"
                       type="tel"
                       value={formData.mobile}
                       onChange={(e) => handleChange('mobile', e.target.value)}
@@ -527,8 +553,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Alternate Number</label>
+                    <label htmlFor="blAlternateNumber" className="block text-sm font-medium text-slate-300 mb-2">Alternate Number</label>
                     <input
+                      id="blAlternateNumber"
+                      name="blAlternateNumber"
+                      autoComplete="off"
                       type="tel"
                       value={formData.alternateNumber}
                       onChange={(e) => handleChange('alternateNumber', e.target.value)}
@@ -537,8 +566,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <label htmlFor="blEmail" className="block text-sm font-medium text-slate-300 mb-2">Email</label>
                     <input
+                      id="blEmail"
+                      name="blEmail"
+                      autoComplete="off"
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleChange('email', e.target.value)}
@@ -547,8 +579,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Website</label>
+                    <label htmlFor="blWebsite" className="block text-sm font-medium text-slate-300 mb-2">Website</label>
                     <input
+                      id="blWebsite"
+                      name="blWebsite"
+                      autoComplete="off"
                       type="url"
                       value={formData.website}
                       onChange={(e) => handleChange('website', e.target.value)}
@@ -569,8 +604,11 @@ export default function BusinessLocations() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Custom Field 1</label>
+                    <label htmlFor="blCustomField1" className="block text-sm font-medium text-slate-300 mb-2">Custom Field 1</label>
                     <input
+                      id="blCustomField1"
+                      name="blCustomField1"
+                      autoComplete="off"
                       type="text"
                       value={formData.customField1}
                       onChange={(e) => handleChange('customField1', e.target.value)}
@@ -578,8 +616,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Custom Field 2</label>
+                    <label htmlFor="blCustomField2" className="block text-sm font-medium text-slate-300 mb-2">Custom Field 2</label>
                     <input
+                      id="blCustomField2"
+                      name="blCustomField2"
+                      autoComplete="off"
                       type="text"
                       value={formData.customField2}
                       onChange={(e) => handleChange('customField2', e.target.value)}
@@ -587,8 +628,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Custom Field 3</label>
+                    <label htmlFor="blCustomField3" className="block text-sm font-medium text-slate-300 mb-2">Custom Field 3</label>
                     <input
+                      id="blCustomField3"
+                      name="blCustomField3"
+                      autoComplete="off"
                       type="text"
                       value={formData.customField3}
                       onChange={(e) => handleChange('customField3', e.target.value)}
@@ -596,8 +640,11 @@ export default function BusinessLocations() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Custom Field 4</label>
+                    <label htmlFor="blCustomField4" className="block text-sm font-medium text-slate-300 mb-2">Custom Field 4</label>
                     <input
+                      id="blCustomField4"
+                      name="blCustomField4"
+                      autoComplete="off"
                       type="text"
                       value={formData.customField4}
                       onChange={(e) => handleChange('customField4', e.target.value)}

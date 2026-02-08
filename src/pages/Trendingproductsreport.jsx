@@ -342,8 +342,10 @@ export default function Trendingproductsreport() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Date Range</label>
+            <label htmlFor="tprDateRange" className="block text-sm text-slate-400 mb-1">Date Range</label>
             <select
+              id="tprDateRange"
+              name="tprDateRange"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -364,8 +366,10 @@ export default function Trendingproductsreport() {
           {dateRange === 'custom' && (
             <>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">Start Date</label>
+                <label htmlFor="tprStartDate" className="block text-sm text-slate-400 mb-1">Start Date</label>
                 <input
+                  id="tprStartDate"
+                  name="tprStartDate"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -373,8 +377,10 @@ export default function Trendingproductsreport() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">End Date</label>
+                <label htmlFor="tprEndDate" className="block text-sm text-slate-400 mb-1">End Date</label>
                 <input
+                  id="tprEndDate"
+                  name="tprEndDate"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -385,8 +391,10 @@ export default function Trendingproductsreport() {
           )}
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Category</label>
+            <label htmlFor="tprCategory" className="block text-sm text-slate-400 mb-1">Category</label>
             <select
+              id="tprCategory"
+              name="tprCategory"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
@@ -399,8 +407,10 @@ export default function Trendingproductsreport() {
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Brand</label>
+            <label htmlFor="tprBrand" className="block text-sm text-slate-400 mb-1">Brand</label>
             <select
+              id="tprBrand"
+              name="tprBrand"
               value={filterBrand}
               onChange={(e) => setFilterBrand(e.target.value)}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
