@@ -8,6 +8,9 @@ export default function Salesorder() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [shippingFilter, setShippingFilter] = useState('all')
+  const [customerFilter, setCustomerFilter] = useState('all')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [showViewModal, setShowViewModal] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [activeDropdown, setActiveDropdown] = useState(null)
@@ -22,8 +25,11 @@ export default function Salesorder() {
                          customer?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter
     const matchesShipping = shippingFilter === 'all' || order.shippingStatus === shippingFilter
-    return matchesSearch && matchesStatus && matchesShipping
+    const matchesCustomer = customerFilter === 'all' || order.customerId === customerFilter
+    return matchesSearch && matchesStatus && matchesShipping && matchesCustomer
   })
+  const totalPages = Math.ceil(filteredOrders.length / pageSize)
+  const paginatedOrders = filteredOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const getCustomer = (id) => customers.find(c => c.id === id) || { name: 'Unknown' }
 
@@ -148,7 +154,7 @@ export default function Salesorder() {
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Customer</label>
-            <select className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm">
+            <select value={customerFilter} onChange={(e) => { setCustomerFilter(e.target.value); setCurrentPage(1) }} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm">
               <option value="all">All Customers</option>
               {customers.map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -173,10 +179,10 @@ export default function Salesorder() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -209,12 +215,12 @@ export default function Salesorder() {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.length === 0 ? (
+              {paginatedOrders.length === 0 ? (
                 <tr>
                   <td colSpan="10" className="text-center py-8 text-slate-500">No sales orders found</td>
                 </tr>
               ) : (
-                filteredOrders.map(order => {
+                paginatedOrders.map(order => {
                   const customer = getCustomer(order.customerId)
                   const paid = getActualPaidForSale(order.id)
                   const due = (order.total || 0) - paid
@@ -260,12 +266,16 @@ export default function Salesorder() {
         </div>
 
         <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
-          <span className="text-slate-400 text-sm">Showing 1 to {filteredOrders.length} of {filteredOrders.length} entries</span>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Previous</button>
-            <button className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-sm">1</button>
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Next</button>
-          </div>
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredOrders.length)} to {Math.min(currentPage * pageSize, filteredOrders.length)} of {filteredOrders.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 

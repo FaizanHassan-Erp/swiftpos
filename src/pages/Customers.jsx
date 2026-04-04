@@ -10,6 +10,8 @@ export default function Customers() {
   const [editingCustomer, setEditingCustomer] = useState(null)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const [activeTab, setActiveTab] = useState('ledger')
@@ -30,12 +32,14 @@ export default function Customers() {
     creditLimit: 0
   })
 
-  const filteredCustomers = customers.filter(c => 
+  const filteredCustomers = customers.filter(c =>
     c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.phone?.includes(searchTerm) ||
     c.contactId?.toLowerCase().includes(searchTerm.toLowerCase())
   )
+  const totalPages = Math.ceil(filteredCustomers.length / pageSize)
+  const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const activeCustomer = customers.find(c => c.id === activeDropdown)
 
@@ -210,10 +214,10 @@ export default function Customers() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select id="custPageSize" name="custPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
+            <select id="custPageSize" name="custPageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -245,12 +249,12 @@ export default function Customers() {
               </tr>
             </thead>
             <tbody>
-              {filteredCustomers.length === 0 ? (
+              {paginatedCustomers.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="text-center py-8 text-slate-500">No customers found</td>
                 </tr>
               ) : (
-                filteredCustomers.map(customer => (
+                paginatedCustomers.map(customer => (
                   <tr key={customer.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3">
                       <button
@@ -275,6 +279,18 @@ export default function Customers() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)} to {Math.min(currentPage * pageSize, filteredCustomers.length)} of {filteredCustomers.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 

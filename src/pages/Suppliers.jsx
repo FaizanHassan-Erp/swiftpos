@@ -10,6 +10,8 @@ export default function Suppliers() {
   const [editingSupplier, setEditingSupplier] = useState(null)
   const [selectedSupplier, setSelectedSupplier] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const [activeTab, setActiveTab] = useState('ledger')
@@ -39,12 +41,14 @@ export default function Suppliers() {
     designation: ''
   })
 
-  const filteredSuppliers = suppliers.filter(s => 
+  const filteredSuppliers = suppliers.filter(s =>
     s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.phone?.includes(searchTerm) ||
     s.contactId?.toLowerCase().includes(searchTerm.toLowerCase())
   )
+  const totalPages = Math.ceil(filteredSuppliers.length / pageSize)
+  const paginatedSuppliers = filteredSuppliers.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   const activeSupplier = suppliers.find(s => s.id === activeDropdown)
 
@@ -260,10 +264,10 @@ export default function Suppliers() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select id="supPageSize" name="supPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
+            <select id="supPageSize" name="supPageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -300,12 +304,12 @@ export default function Suppliers() {
               </tr>
             </thead>
             <tbody>
-              {filteredSuppliers.length === 0 ? (
+              {paginatedSuppliers.length === 0 ? (
                 <tr>
                   <td colSpan="11" className="text-center py-8 text-slate-500">No suppliers found</td>
                 </tr>
               ) : (
-                filteredSuppliers.map(supplier => (
+                paginatedSuppliers.map(supplier => (
                   <tr key={supplier.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3">
                       <button
@@ -336,12 +340,16 @@ export default function Suppliers() {
         </div>
 
         <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
-          <span className="text-slate-400 text-sm">Showing 1 to {filteredSuppliers.length} of {filteredSuppliers.length} entries</span>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Previous</button>
-            <button className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-sm">1</button>
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Next</button>
-          </div>
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredSuppliers.length)} to {Math.min(currentPage * pageSize, filteredSuppliers.length)} of {filteredSuppliers.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 

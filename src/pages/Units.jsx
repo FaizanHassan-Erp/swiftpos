@@ -8,7 +8,9 @@ export default function Units() {
   const [showModal, setShowModal] = useState(false)
   const [editingUnit, setEditingUnit] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
+
   const [formData, setFormData] = useState({
     name: '',
     shortName: '',
@@ -19,6 +21,8 @@ export default function Units() {
     u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.shortName?.toLowerCase().includes(searchTerm.toLowerCase())
   )
+  const totalPages = Math.ceil(filteredUnits.length / pageSize)
+  const paginatedUnits = filteredUnits.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   function resetForm() {
     setFormData({ name: '', shortName: '', allowDecimal: true })
@@ -87,10 +91,10 @@ export default function Units() {
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select id="unPageSize" name="unPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
+            <select id="unPageSize" name="unPageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -121,12 +125,12 @@ export default function Units() {
               </tr>
             </thead>
             <tbody>
-              {filteredUnits.length === 0 ? (
+              {paginatedUnits.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="text-center py-8 text-slate-500">No units found</td>
                 </tr>
               ) : (
-                filteredUnits.map(unit => (
+                paginatedUnits.map(unit => (
                   <tr key={unit.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3 text-white font-medium">{unit.name}</td>
                     <td className="px-4 py-3 text-slate-300">{unit.shortName}</td>
@@ -163,8 +167,17 @@ export default function Units() {
         </div>
 
         {/* Table Footer */}
-        <div className="p-4 border-t border-slate-700/50">
-          <span className="text-slate-400 text-sm">Showing {filteredUnits.length} entries</span>
+        <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredUnits.length)} to {Math.min(currentPage * pageSize, filteredUnits.length)} of {filteredUnits.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 

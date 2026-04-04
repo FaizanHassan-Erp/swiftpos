@@ -12,6 +12,8 @@ export default function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [viewTab, setViewTab] = useState('details')
   const [searchTerm, setSearchTerm] = useState('')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const [filterCategory, setFilterCategory] = useState('')
@@ -107,6 +109,8 @@ export default function Products() {
     
     return matchesSearch && matchesCategory && matchesBrand && matchesExpiry
   })
+  const totalPages = Math.ceil(filteredProducts.length / pageSize)
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Get active product for dropdown
   const activeProduct = products.find(p => p.id === activeDropdown)
@@ -562,10 +566,10 @@ export default function Products() {
             <div className="p-4 border-b border-slate-700/50 flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-slate-400 text-sm">Show</span>
-                <select id="prodPageSize" name="prodPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-                  <option>25</option>
-                  <option>50</option>
-                  <option>100</option>
+                <select id="prodPageSize" name="prodPageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
                 </select>
                 <span className="text-slate-400 text-sm">entries</span>
               </div>
@@ -649,12 +653,12 @@ export default function Products() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.length === 0 ? (
+                  {paginatedProducts.length === 0 ? (
                     <tr>
                       <td colSpan="8" className="text-center py-8 text-slate-500">No products found</td>
                     </tr>
                   ) : (
-                    filteredProducts.map(product => (
+                    paginatedProducts.map(product => (
                       <tr key={product.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                         <td className="px-4 py-3">
                           <button
@@ -711,12 +715,16 @@ export default function Products() {
 
             {/* Table Footer */}
             <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
-              <span className="text-slate-400 text-sm">Showing {filteredProducts.length} of {products.length} entries</span>
-              <div className="flex items-center gap-2">
-                <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Previous</button>
-                <button className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-sm">1</button>
-                <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Next</button>
-              </div>
+              <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredProducts.length)} to {Math.min(currentPage * pageSize, filteredProducts.length)} of {filteredProducts.length} entries</span>
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+                  ))}
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+                </div>
+              )}
             </div>
           </>
         )}

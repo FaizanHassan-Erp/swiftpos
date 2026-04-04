@@ -8,6 +8,8 @@ export default function SalesAgents() {
   const [showModal, setShowModal] = useState(false)
   const [editingAgent, setEditingAgent] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,10 +18,12 @@ export default function SalesAgents() {
     commissionPercentage: ''
   })
 
-  const filteredAgents = salesAgents.filter(agent => 
+  const filteredAgents = salesAgents.filter(agent =>
     agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     agent.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
+  const totalPages = Math.ceil(filteredAgents.length / pageSize)
+  const paginatedAgents = filteredAgents.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   function openAddModal() {
     setEditingAgent(null)
@@ -81,8 +85,10 @@ export default function SalesAgents() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select id="agentPageSize" name="agentPageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
+            <select id="agentPageSize" name="agentPageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -115,12 +121,12 @@ export default function SalesAgents() {
               </tr>
             </thead>
             <tbody>
-              {filteredAgents.length === 0 ? (
+              {paginatedAgents.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-8 text-slate-500">No data available in table</td>
                 </tr>
               ) : (
-                filteredAgents.map((agent, index) => (
+                paginatedAgents.map((agent, index) => (
                   <tr key={agent.id || `agent-${index}`} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3 text-white">{agent.name}</td>
                     <td className="px-4 py-3 text-slate-300">{agent.email || '-'}</td>
@@ -156,12 +162,16 @@ export default function SalesAgents() {
 
         {/* Table Footer */}
         <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
-          <span className="text-slate-400 text-sm">Showing 0 to 0 of 0 entries</span>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Previous</button>
-            <button className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-sm">1</button>
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Next</button>
-          </div>
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredAgents.length)} to {Math.min(currentPage * pageSize, filteredAgents.length)} of {filteredAgents.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 

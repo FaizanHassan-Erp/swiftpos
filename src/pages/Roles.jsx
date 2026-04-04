@@ -8,6 +8,8 @@ export default function Roles() {
   const [showModal, setShowModal] = useState(false)
   const [editingRole, setEditingRole] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [pageSize, setPageSize] = useState(25)
+  const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
     permissions: []
@@ -27,9 +29,11 @@ export default function Roles() {
     { id: 'settings', name: 'Settings' }
   ]
 
-  const filteredRoles = roles.filter(role => 
+  const filteredRoles = roles.filter(role =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+  const totalPages = Math.ceil(filteredRoles.length / pageSize)
+  const paginatedRoles = filteredRoles.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   function openAddModal() {
     setEditingRole(null)
@@ -104,8 +108,10 @@ export default function Roles() {
         <div className="p-4 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-slate-400 text-sm">Show</span>
-            <select id="rolePageSize" name="rolePageSize" aria-label="Entries per page" className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
-              <option>25</option>
+            <select id="rolePageSize" name="rolePageSize" aria-label="Entries per page" value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1) }} className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-white text-sm">
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
             <span className="text-slate-400 text-sm">entries</span>
           </div>
@@ -134,12 +140,12 @@ export default function Roles() {
               </tr>
             </thead>
             <tbody>
-              {filteredRoles.length === 0 ? (
+              {paginatedRoles.length === 0 ? (
                 <tr>
                   <td colSpan="2" className="text-center py-8 text-slate-500">No roles found</td>
                 </tr>
               ) : (
-                filteredRoles.map((role, index) => (
+                paginatedRoles.map((role, index) => (
                   <tr key={role.id || `role-${index}`} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                     <td className="px-4 py-3 text-white">{role.name}</td>
                     <td className="px-4 py-3">
@@ -171,12 +177,16 @@ export default function Roles() {
 
         {/* Table Footer */}
         <div className="p-4 border-t border-slate-700/50 flex items-center justify-between">
-          <span className="text-slate-400 text-sm">Showing 1 to {filteredRoles.length} of {filteredRoles.length} entries</span>
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Previous</button>
-            <button className="px-3 py-1 bg-emerald-500 text-white rounded-lg text-sm">1</button>
-            <button className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm">Next</button>
-          </div>
+          <span className="text-slate-400 text-sm">Showing {Math.min((currentPage - 1) * pageSize + 1, filteredRoles.length)} to {Math.min(currentPage * pageSize, filteredRoles.length)} of {filteredRoles.length} entries</span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Previous</button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i + 1} onClick={() => setCurrentPage(i + 1)} className={`px-3 py-1 rounded-lg text-sm ${currentPage === i + 1 ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300'}`}>{i + 1}</button>
+              ))}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 bg-slate-700 text-slate-300 rounded-lg text-sm disabled:opacity-50">Next</button>
+            </div>
+          )}
         </div>
       </div>
 
